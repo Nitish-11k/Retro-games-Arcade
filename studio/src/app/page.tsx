@@ -14,10 +14,10 @@ export default function Home() {
         <GameGallery />
         {/* <section id="recommender" className="py-16">
            <AiRecommender />
-        </section>
+        </section> */}
         <section id="leaderboard" className="py-16">
           <Leaderboards />
-        </section> */}
+        </section>
       </main>
       <Footer />
     </div>
