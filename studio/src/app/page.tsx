@@ -12,12 +12,12 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
         <Hero />
         <GameGallery />
-        <section id="recommender" className="py-16">
+        {/* <section id="recommender" className="py-16">
            <AiRecommender />
         </section>
         <section id="leaderboard" className="py-16">
           <Leaderboards />
-        </section>
+        </section> */}
       </main>
       <Footer />
     </div>
