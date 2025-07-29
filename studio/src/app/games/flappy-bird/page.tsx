@@ -1,0 +1,17 @@
+import FlappyBirdGame from '@/components/games/flappy-bird';
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+
+const FlappyBirdPage = () => {
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-200">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        <FlappyBirdGame />
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default FlappyBirdPage;
