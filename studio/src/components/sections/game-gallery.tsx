@@ -6,6 +6,7 @@ import AdPlaceholder from '@/components/ad-placeholder';
 import PixelSlitherCard from '@/components/games/pixel-slither-card';
 import PixelPaddleCard from '@/components/games/pixel-paddle-card';
 import FlappyBirdCard from '@/components/games/flappy-bird-card';
+import TetrisCard from '@/components/games/tetris-card';
 
 const games: Game[] = [
   { id: 'flappy-pixel', title: 'Flappy Pixel', description: 'Flap your way through the pixel pipes!', image: 'https://placehold.co/300x200.png', dataAiHint: 'flappy bird retro', instructions: 'Click the mouse or press the spacebar to make the bird jump. Avoid the pipes!' },
@@ -23,7 +24,7 @@ const GameGallery = () => {
       <div className="mb-8">
         <AdPlaceholder />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Featured Games */}
         <div className="sm:col-span-2 lg:col-span-1">
           <PixelSlitherCard />
@@ -33,6 +34,9 @@ const GameGallery = () => {
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
           <FlappyBirdCard />
+        </div>
+        <div className="sm:col-span-2 lg:col-span-1">
+          <TetrisCard />
         </div>
         
         {games.map((game) => (
