@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { Play, RotateCcw, Trophy, Star, Crown, Lock, Zap, Target, Flame, Award, Medal } from 'lucide-react';
 import { createPaddleAchievements, loadPaddleGameData, savePaddleGameData, type PaddleGameData } from '@/lib/pixel-paddle-utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // --- GAME CONSTANTS ---
 const CANVAS_WIDTH = 800;
@@ -96,6 +97,9 @@ const PixelPaddle: React.FC = () => {
   const lastTimeRef = useRef<number>(0);
   const pressedKeys = useRef<{ [key: string]: boolean }>({});
   const lifeDeductedRef = useRef<boolean>(false);
+
+  const isMobile = useIsMobile();
+  const [mobileMove, setMobileMove] = useState<'left' | 'right' | null>(null);
 
   const [gameState, setGameState] = useState<'START_SCREEN' | 'PLAYING' | 'LEVEL_COMPLETE' | 'GAME_OVER'>('START_SCREEN');
   const [lives, setLives] = useState(3);
@@ -213,8 +217,8 @@ const PixelPaddle: React.FC = () => {
       // Paddle
       setPaddle(p => {
         let newX = p.x;
-        if (pressedKeys.current.a || pressedKeys.current.arrowleft) newX -= PADDLE_SPEED * deltaTime;
-        if (pressedKeys.current.d || pressedKeys.current.arrowright) newX += PADDLE_SPEED * deltaTime;
+        if (pressedKeys.current.a || pressedKeys.current.arrowleft || mobileMove === 'left') newX -= PADDLE_SPEED * deltaTime;
+        if (pressedKeys.current.d || pressedKeys.current.arrowright || mobileMove === 'right') newX += PADDLE_SPEED * deltaTime;
         return { ...p, x: Math.max(0, Math.min(CANVAS_WIDTH - p.w, newX)) };
       });
 
@@ -457,7 +461,7 @@ const PixelPaddle: React.FC = () => {
     };
     gameLoopId.current = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(gameLoopId.current);
-  }, [gameState, isClient, ball, bricks, paddle, lives, level, gameData, ballSpeed, activePowerUp]);
+  }, [gameState, isClient, ball, bricks, paddle, lives, level, gameData, ballSpeed, activePowerUp, mobileMove]);
   
   // --- CONTROLS ---
   useEffect(() => {
@@ -776,6 +780,30 @@ const PixelPaddle: React.FC = () => {
       <footer className="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
         <p className="text-xs text-gray-500">FOOTER ADVERTISEMENT</p>
       </footer>
+
+      {/* Mobile Controls */}
+      {isMobile && gameState === 'PLAYING' && (
+        <div className="absolute bottom-5 left-0 right-0 flex justify-between px-5 z-10">
+          <Button
+            onTouchStart={() => setMobileMove('left')}
+            onTouchEnd={() => setMobileMove(null)}
+            onMouseDown={() => setMobileMove('left')}
+            onMouseUp={() => setMobileMove(null)}
+            className="select-none bg-yellow-500 bg-opacity-30 hover:bg-opacity-50 text-white font-bold rounded-full w-24 h-24 text-4xl"
+          >
+            &larr;
+          </Button>
+          <Button
+            onTouchStart={() => setMobileMove('right')}
+            onTouchEnd={() => setMobileMove(null)}
+            onMouseDown={() => setMobileMove('right')}
+            onMouseUp={() => setMobileMove(null)}
+            className="select-none bg-yellow-500 bg-opacity-30 hover:bg-opacity-50 text-white font-bold rounded-full w-24 h-24 text-4xl"
+          >
+            &rarr;
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
