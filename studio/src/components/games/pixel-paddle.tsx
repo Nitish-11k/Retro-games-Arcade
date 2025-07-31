@@ -783,25 +783,37 @@ const PixelPaddle: React.FC = () => {
 
       {/* Mobile Controls */}
       {isMobile && gameState === 'PLAYING' && (
-        <div className="absolute bottom-5 left-0 right-0 flex justify-between px-5 z-10">
-          <Button
-            onTouchStart={() => setMobileMove('left')}
-            onTouchEnd={() => setMobileMove(null)}
-            onMouseDown={() => setMobileMove('left')}
-            onMouseUp={() => setMobileMove(null)}
-            className="select-none bg-yellow-500 bg-opacity-30 hover:bg-opacity-50 text-white font-bold rounded-full w-24 h-24 text-4xl"
-          >
-            &larr;
-          </Button>
-          <Button
-            onTouchStart={() => setMobileMove('right')}
-            onTouchEnd={() => setMobileMove(null)}
-            onMouseDown={() => setMobileMove('right')}
-            onMouseUp={() => setMobileMove(null)}
-            className="select-none bg-yellow-500 bg-opacity-30 hover:bg-opacity-50 text-white font-bold rounded-full w-24 h-24 text-4xl"
-          >
-            &rarr;
-          </Button>
+        <div className="fixed bottom-8 left-0 right-0 flex justify-between px-8 z-50 pointer-events-none">
+          <div className="pointer-events-auto">
+            <Button
+              onTouchStart={() => setMobileMove('left')}
+              onTouchEnd={() => setMobileMove(null)}
+              onMouseDown={() => setMobileMove('left')}
+              onMouseUp={() => setMobileMove(null)}
+              className="select-none bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold rounded-full w-20 h-20 text-3xl border-4 border-yellow-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
+              style={{ 
+                boxShadow: '0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+              }}
+            >
+              <span className="drop-shadow-sm">←</span>
+            </Button>
+          </div>
+          <div className="pointer-events-auto">
+            <Button
+              onTouchStart={() => setMobileMove('right')}
+              onTouchEnd={() => setMobileMove(null)}
+              onMouseDown={() => setMobileMove('right')}
+              onMouseUp={() => setMobileMove(null)}
+              className="select-none bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold rounded-full w-20 h-20 text-3xl border-4 border-yellow-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
+              style={{ 
+                boxShadow: '0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+              }}
+            >
+              <span className="drop-shadow-sm">→</span>
+            </Button>
+          </div>
         </div>
       )}
     </div>
