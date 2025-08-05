@@ -3,14 +3,17 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Pacman, Ghost, map as initialMap, TILE_SIZE, COLS, ROWS } from '@/lib/pac-man-utils';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { RotateCcw, Play } from 'lucide-react';
 
 // It's a good practice to define constants that won't change outside the component
-const PACMAN_START_POS = { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 17 + TILE_SIZE / 2 };
+const PACMAN_START_POS = { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 20 + TILE_SIZE / 2 };
 const GHOST_START_POS = [
-  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 9 + TILE_SIZE / 2, color: 'red' },
-  { x: TILE_SIZE * 9 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'pink' },
-  { x: TILE_SIZE * 11 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'cyan' },
-  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'orange' },
+  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 9 + TILE_SIZE / 2, color: 'red', personality: 'blinky' as const },
+  { x: TILE_SIZE * 9 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'pink', personality: 'pinky' as const },
+  { x: TILE_SIZE * 11 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'cyan', personality: 'inky' as const },
+  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'orange', personality: 'clyde' as const },
 ];
 
 const PacManGame: React.FC = () => {
@@ -36,7 +39,7 @@ const PacManGame: React.FC = () => {
     const mapCopy = initialMap.map(row => [...row]);
     gameInstance.current = {
       pacman: new Pacman(PACMAN_START_POS.x, PACMAN_START_POS.y),
-      ghosts: GHOST_START_POS.map(g => new Ghost(g.x, g.y, g.color as any)),
+      ghosts: GHOST_START_POS.map(g => new Ghost(g.x, g.y, g.color, g.personality)),
       map: mapCopy,
       pelletsCount: mapCopy.flat().filter(tile => tile === 0 || tile === 3).length,
     };
@@ -92,8 +95,14 @@ const PacManGame: React.FC = () => {
       // Update and draw Pac-Man and Ghosts
       pacman.update();
       pacman.draw(ctx);
+      const blinky = ghosts.find(g => g.personality === 'blinky');
+
       ghosts.forEach(ghost => {
-        ghost.update();
+        if (blinky) {
+          ghost.update(pacman.x, pacman.y, blinky.x, blinky.y);
+        } else {
+          ghost.update(pacman.x, pacman.y, pacman.x, pacman.y);
+        }
         ghost.draw(ctx);
       });
 
@@ -186,61 +195,141 @@ const PacManGame: React.FC = () => {
   }, [isGameWon]);
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl font-bold mb-4">Pac-Man</h1>
-      {!isGameStarted ? (
-        <div className="flex flex-col items-center justify-center min-h-[500px] p-8">
-          <h2 className="text-4xl font-bold mb-6 text-yellow-400">🟡 PAC-MAN</h2>
-          <div className="bg-blue-900 p-6 rounded-lg mb-6 text-center max-w-md">
-            <h3 className="text-xl font-bold mb-4 text-yellow-300">How to Play:</h3>
-            <div className="text-left space-y-2">
-              <p>🎮 <strong>Movement:</strong> Arrow Keys or W, A, S, D</p>
-              <p>🟡 <strong>Goal:</strong> Eat all pellets to win</p>
-              <p>⚪ <strong>Power Pellets:</strong> Make ghosts vulnerable</p>
-              <p>👻 <strong>Ghosts:</strong> Avoid them or eat them when blue</p>
-              <p>❤️ <strong>Lives:</strong> You have 3 lives</p>
-            </div>
-          </div>
-          <Button onClick={() => {startGame(); setShowInstructions(true);}} className="text-lg px-8 py-3">
-            Start Game
-          </Button>
+    <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+      <header className="mb-6 text-center">
+        <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">PAC-MAN</h1>
+        <p className="text-sm text-green-400">A RETRO MAZE ADVENTURE</p>
+      </header>
+      
+      <div className="mb-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
+        <p className="text-xs text-gray-500">ADVERTISEMENT</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
+            <CardHeader className="pb-4">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-yellow-300">GAME ARENA</CardTitle>
+                <div className="flex gap-2">
+                  {!isGameStarted || isGameOver || isGameWon ? (
+                    <Button onClick={() => {startGame(); setShowInstructions(true);}} className="bg-yellow-400 text-black hover:bg-yellow-300">
+                      <Play className="w-4 h-4 mr-2" /> PLAY
+                    </Button>
+                  ) : (
+                    <Button onClick={() => {startGame(); setShowInstructions(true);}} className="bg-red-600 text-white hover:bg-red-700">
+                      <RotateCcw className="w-4 h-4 mr-2" /> RESTART
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="flex justify-center items-center p-2">
+              <div className="relative w-full" style={{ aspectRatio: `${COLS * TILE_SIZE}/${ROWS * TILE_SIZE}`, minHeight: '500px', maxHeight: '70vh' }}>
+                <canvas 
+                  ref={canvasRef} 
+                  width={COLS * TILE_SIZE} 
+                  height={ROWS * TILE_SIZE} 
+                  className="border-4 border-yellow-300 bg-black w-full h-full"
+                  style={{ objectFit: 'contain' }}
+                />
+                {!isGameStarted && (
+                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
+                    <h3 className="text-2xl mb-4 font-bold text-yellow-300">PAC-MAN</h3>
+                    <p className="text-sm mb-2 text-gray-300">USE ARROW KEYS OR WASD</p>
+                    <p className="text-xs text-gray-400 mb-4">EAT ALL PELLETS AND AVOID GHOSTS!</p>
+                  </div>
+                )}
+                {showInstructions && isGameStarted && (
+                  <div className="absolute top-4 left-4 bg-black bg-opacity-80 p-4 rounded-lg text-white text-sm">
+                    <p className="font-bold text-yellow-400 mb-2">First time playing?</p>
+                    <p>Use Arrow Keys or WASD to move Pac-Man</p>
+                    <p>Eat all pellets and avoid ghosts!</p>
+                    <button 
+                      onClick={() => setShowInstructions(false)}
+                      className="mt-2 text-xs bg-blue-600 px-2 py-1 rounded hover:bg-blue-700"
+                    >
+                      Got it!
+                    </button>
+                  </div>
+                )}
+                {(isGameOver || isGameWon) && (
+                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
+                    <h3 className="text-2xl mb-2 font-bold text-red-500">{isGameWon ? '🎉 YOU WIN!' : '💀 GAME OVER'}</h3>
+                    <p className="text-lg mb-2 text-gray-200">FINAL SCORE: {score}</p>
+                    <p className="text-sm mb-4 text-yellow-400">CLICK RESTART TO PLAY AGAIN</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      ) : (
-        <div className="relative">
-          <canvas ref={canvasRef} width={COLS * TILE_SIZE} height={ROWS * TILE_SIZE} className="bg-black border-4 border-blue-500" />
-          <div className="text-white mt-4 flex justify-between items-center">
-            <div className="text-lg">
-              <p>Score: <span className="text-yellow-400 font-bold">{score}</span></p>
-              <p>Lives: <span className="text-red-400 font-bold">{'❤️'.repeat(lives)}</span></p>
-            </div>
-            <div className="text-sm text-gray-300">
-              <p>Arrow Keys or WASD to move</p>
-            </div>
-          </div>
-          
-          {showInstructions && isGameStarted && (
-            <div className="absolute top-4 left-4 bg-black bg-opacity-80 p-4 rounded-lg text-white text-sm">
-              <p className="font-bold text-yellow-400 mb-2">First time playing?</p>
-              <p>Use Arrow Keys or WASD to move Pac-Man</p>
-              <p>Eat all pellets and avoid ghosts!</p>
-              <button 
-                onClick={() => setShowInstructions(false)}
-                className="mt-2 text-xs bg-blue-600 px-2 py-1 rounded hover:bg-blue-700"
-              >
-                Got it!
-              </button>
-            </div>
-          )}
-          
-          {(isGameOver || isGameWon) && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-90 p-8 rounded-lg text-white text-center">
-              <h2 className="text-3xl mb-4 font-bold">{isGameWon ? '🎉 You Win!' : '💀 Game Over'}</h2>
-              <p className="mb-4">Final Score: <span className="text-yellow-400 font-bold">{score}</span></p>
-              <Button onClick={() => {startGame(); setShowInstructions(true);}}>Play Again</Button>
-            </div>
-          )}
-        </div>
-      )}
+
+        <aside className="space-y-4">
+          <Card className="bg-gray-800 border-2 border-yellow-300 shadow-[4px_4px_0px_#FBC02D]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-yellow-300 text-sm">SCORE BOARD</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-3xl font-bold text-white">{score}</div>
+                <div className="text-xs text-yellow-400/80">SCORE</div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-center">
+                <div>
+                  <div className="text-lg text-red-500">{'♥ '.repeat(Math.max(0, lives))}</div>
+                  <div className="text-xs text-gray-400">LIVES</div>
+                </div>
+                <div>
+                  <div className="text-lg text-green-400">0</div>
+                  <div className="text-xs text-gray-400">BEST</div>
+                </div>
+              </div>
+              <div className="text-center pt-2 border-t border-yellow-300/20">
+                <Badge variant="outline" className="text-yellow-300 border-yellow-300/50">
+                  {isGameStarted ? (isGameOver || isGameWon ? 'GAME ENDED' : 'PLAYING') : 'READY'}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-2 border-blue-400">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-blue-400 text-sm">CONTROLS</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-lg font-bold text-white">ARROW KEYS</div>
+                <div className="text-xs text-blue-400/80">TO MOVE</div>
+              </div>
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-lg font-bold text-white">WASD</div>
+                <div className="text-xs text-blue-400/80">ALTERNATIVE</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-2 border-green-400">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-green-400 text-sm">GAME INFO</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-sm text-gray-300 mb-1">⚪ Small pellets = 10 points</div>
+                <div className="text-xs text-green-400">🟡 Power pellets = 50 points</div>
+              </div>
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-sm text-gray-300 mb-1">👻 Eat frightened ghosts</div>
+                <div className="text-xs text-blue-400">= 200 points each!</div>
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
+      </div>
+      
+      <footer className="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
+        <p className="text-xs text-gray-500">FOOTER ADVERTISEMENT</p>
+      </footer>
     </div>
   );
 };

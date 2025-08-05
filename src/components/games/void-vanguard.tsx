@@ -42,7 +42,7 @@ const COLORS = {
     POWER_UP: '#39FF14',
 };
 
-const FONT_FAMILY = `"'Press Start 2P', cursive"`;
+const FONT_FAMILY = "'Press Start 2P', monospace";
 
 // --- 2. DATA STRUCTURES (Quadtree) ---
 class Quadtree {
@@ -424,12 +424,10 @@ nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { ...b, y: b
                 // Standard enemy firing logic
                 if (now - updatedEnemy.lastShot > ENEMY_FIRE_RATE * 1000 && updatedEnemy.y > 0) {
                     const bulletIndex = enemyBullets.findIndex(b => !b.active);
-                    if (bulletIndex !== -1) {
-                        const playerCenter = nextState.player.x + PLAYER_WIDTH / 2;
+                    if (bulletIndex !== -1 && updatedEnemy.y > 0) {
                         const enemyCenter = updatedEnemy.x + updatedEnemy.width / 2;
-                        const angle = Math.atan2(nextState.player.y - updatedEnemy.y, playerCenter - enemyCenter);
-                        const vx = Math.cos(angle) * ENEMY_BULLET_SPEED;
-                        const vy = Math.sin(angle) * ENEMY_BULLET_SPEED;
+                        const vx = 0; // Bullets travel straight down
+                        const vy = ENEMY_BULLET_SPEED; // Downward speed
                         enemyBullets[bulletIndex] = { ...enemyBullets[bulletIndex], active: true, x: enemyCenter, y: updatedEnemy.y + updatedEnemy.height, vx, vy };
                         updatedEnemy.lastShot = now;
                     }
@@ -699,8 +697,8 @@ const GameCanvas: React.FC = () => {
     }, [dispatch, quadtree, keysPressed]), state.status === 'PLAYING');
 
     return (
-        <div className="relative">
-            <svg viewBox={`0 0 ${GAME_WIDTH} ${GAME_HEIGHT}`} className="w-full h-auto bg-gray-900 border-4 border-yellow-300">
+        <div className="relative w-full" style={{ aspectRatio: `${GAME_WIDTH}/${GAME_HEIGHT}`, minHeight: '500px', maxHeight: '70vh' }}>
+            <svg viewBox={`0 0 ${GAME_WIDTH} ${GAME_HEIGHT}`} className="w-full h-full bg-gray-900 border-4 border-yellow-300" preserveAspectRatio="xMidYMid meet">
                 <rect width={GAME_WIDTH} height={GAME_HEIGHT} fill={COLORS.BACKGROUND} />
                 {(state.status === 'PLAYING' || state.status === 'GAME_OVER' || state.status === 'LEVEL_COMPLETE' || state.status === 'YOU_WIN') && (
                     <>
@@ -754,9 +752,17 @@ const VoidVanguardGame = () => {
                         <CardHeader className="pb-4">
                             <div className="flex justify-between items-center">
                                 <CardTitle className="text-yellow-300">GAME ARENA</CardTitle>
-                                <Button onClick={() => dispatch({ type: 'START_GAME' })} className="bg-yellow-400 text-black hover:bg-yellow-300">
-                                    <Play className="w-4 h-4 mr-2" /> PLAY
-                                </Button>
+                                <div className="flex gap-2">
+                                    {state.status === 'START_SCREEN' || state.status === 'GAME_OVER' || state.status === 'YOU_WIN' ? (
+                                        <Button onClick={() => dispatch({ type: 'START_GAME' })} className="bg-yellow-400 text-black hover:bg-yellow-300">
+                                            <Play className="w-4 h-4 mr-2" /> PLAY
+                                        </Button>
+                                    ) : (
+                                        <Button onClick={() => dispatch({ type: 'RESET_GAME' })} className="bg-red-600 text-white hover:bg-red-700">
+                                            <RotateCcw className="w-4 h-4 mr-2" /> QUIT
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent className="flex justify-center items-center p-2">
@@ -766,17 +772,36 @@ const VoidVanguardGame = () => {
                 </div>
                 <aside className="space-y-4">
                     <StatsSidebar />
+                    
+                    <Card className="bg-gray-800 border-2 border-blue-400">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-blue-400 text-sm">CONTROLS</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                                <div className="text-lg font-bold text-white">ARROW KEYS</div>
+                                <div className="text-xs text-blue-400/80">TO MOVE</div>
+                            </div>
+                            <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                                <div className="text-lg font-bold text-white">SPACEBAR</div>
+                                <div className="text-xs text-blue-400/80">TO SHOOT</div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     <Card className="bg-gray-800 border-2 border-green-400">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-green-400 text-sm">RECORDS</CardTitle>
+                            <CardTitle className="text-green-400 text-sm">GAME INFO</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-1 gap-2">
-                            <Button className="w-full bg-green-600 text-white hover:bg-green-500" disabled>
-                                LEADERBOARD
-                            </Button>
-                            <Button className="w-full bg-yellow-600 text-white hover:bg-yellow-500" disabled>
-                                ACHIEVEMENTS
-                            </Button>
+                        <CardContent className="space-y-3">
+                            <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                                <div className="text-sm text-gray-300 mb-1">Standard Enemy = 50 pts</div>
+                                <div className="text-xs text-green-400">Boss Enemy = 1000 pts</div>
+                            </div>
+                            <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                                <div className="text-sm text-gray-300 mb-1">Power-ups boost abilities</div>
+                                <div className="text-xs text-blue-400">Survive enemy waves!</div>
+                            </div>
                         </CardContent>
                     </Card>
                 </aside>

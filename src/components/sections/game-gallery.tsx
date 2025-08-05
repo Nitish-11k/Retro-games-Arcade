@@ -9,6 +9,7 @@ import FlappyBirdCard from '@/components/games/flappy-bird-card';
 import TetrisCard from '@/components/games/tetris-card';
 import PacManCard from '@/components/games/pac-man-card';
 import VoidVanguardCard from '@/components/games/void-vanguard-card';
+import BounceBallCard from '@/components/games/bounce-ball-card';
 
 const games: Game[] = [
   { id: 'flappy-pixel', title: 'Flappy Pixel', description: 'Flap your way through the pixel pipes!', image: 'https://placehold.co/300x200.png', dataAiHint: 'flappy bird retro', instructions: 'Click the mouse or press the spacebar to make the bird jump. Avoid the pipes!' },
@@ -45,6 +46,9 @@ const GameGallery = () => {
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
           <VoidVanguardCard />
+        </div>
+        <div className="sm:col-span-2 lg:col-span-1">
+          <BounceBallCard />
         </div>
         
         

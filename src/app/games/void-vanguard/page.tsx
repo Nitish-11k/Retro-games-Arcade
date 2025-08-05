@@ -6,7 +6,7 @@ const VoidVanguardPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main>
         <VoidVanguardGame />
       </main>
       <Footer />
