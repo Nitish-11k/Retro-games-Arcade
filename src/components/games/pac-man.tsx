@@ -19,6 +19,7 @@ const GHOST_START_POS = [
 const PacManGame: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
@@ -32,6 +33,22 @@ const PacManGame: React.FC = () => {
     map: number[][];
     pelletsCount: number;
   } | null>(null);
+
+  // Load best score from localStorage on component mount
+  useEffect(() => {
+    const savedBestScore = localStorage.getItem('pacman-best-score');
+    if (savedBestScore) {
+      setBestScore(parseInt(savedBestScore, 10));
+    }
+  }, []);
+
+  // Save best score when score changes
+  useEffect(() => {
+    if (score > bestScore) {
+      setBestScore(score);
+      localStorage.setItem('pacman-best-score', score.toString());
+    }
+  }, [score, bestScore]);
 
   // This useCallback is now simpler. It just resets state and lets the useEffects handle the rest.
   // The dependency array is empty because it only uses setter functions, which are stable.
@@ -281,7 +298,7 @@ const PacManGame: React.FC = () => {
                   <div className="text-xs text-gray-400">LIVES</div>
                 </div>
                 <div>
-                  <div className="text-lg text-green-400">0</div>
+                  <div className="text-lg text-green-400">{bestScore}</div>
                   <div className="text-xs text-gray-400">BEST</div>
                 </div>
               </div>
