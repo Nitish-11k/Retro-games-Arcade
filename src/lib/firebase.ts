@@ -1,22 +1,39 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration (prefer env vars; fallback to defaults for dev)
 const firebaseConfig = {
-  projectId: "pixel-playground-vayvx",
-  appId: "1:504459363139:web:899bf961f0ae150a1d65f6",
-  storageBucket: "pixel-playground-vayvx.firebasestorage.app",
-  apiKey: "AIzaSyDNuUsvP3sB8HNgwOtuA_gNbiCohXtFd5I",
-  authDomain: "pixel-playground-vayvx.firebaseapp.com",
-  measurementId: "",
-  messagingSenderId: "504459363139"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDNuUsvP3sB8HNgwOtuA_gNbiCohXtFd5I",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "pixel-playground-vayvx.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "pixel-playground-vayvx",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "pixel-playground-vayvx.firebasestorage.app",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "504459363139",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:504459363139:web:899bf961f0ae150a1d65f6",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
 };
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
+// Ensure persistent sessions in the browser
+try {
+  void setPersistence(auth, browserLocalPersistence);
+} catch {
+  // no-op (e.g., during SSR)
+}
 const db = getFirestore(app);
 
-export { app, auth, db };
+// Initialize Analytics only in the browser and when supported
+let analytics: ReturnType<typeof getAnalytics> | null = null;
+if (typeof window !== 'undefined') {
+  void isAnalyticsSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+
+export { app, auth, db, analytics };

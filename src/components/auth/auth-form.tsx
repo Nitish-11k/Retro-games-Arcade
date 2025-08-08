@@ -10,6 +10,9 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -71,6 +75,12 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
           description: 'This email is already in use. Please try logging in instead.',
           variant: 'destructive',
         });
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+        toast({
+          title: 'Invalid credentials',
+          description: 'Email or password is incorrect.',
+          variant: 'destructive',
+        });
       } else {
         toast({
           title: 'Authentication Error',
@@ -78,6 +88,39 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
           variant: 'destructive',
         });
       }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      toast({ title: 'Welcome!', description: 'Signed in with Google.' });
+      onAuthSuccess();
+    } catch (error: any) {
+      console.error(error);
+      toast({ title: 'Google Sign-in Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResetPassword() {
+    const email = form.getValues('email');
+    if (!email) {
+      toast({ title: 'Enter your email first', description: 'Please provide your email to reset your password.', variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({ title: 'Reset email sent', description: 'Check your inbox for a password reset link.' });
+    } catch (error: any) {
+      console.error(error);
+      toast({ title: 'Reset failed', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -129,6 +172,17 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
         />
         <Button type="submit" disabled={loading} className="w-full">
           {loading ? 'Working...' : mode === 'login' ? 'Log In' : 'Sign Up'}
+        </Button>
+        {mode === 'login' && (
+          <Button type="button" variant="link" className="w-full" onClick={handleResetPassword} disabled={loading}>
+            Forgot password?
+          </Button>
+        )}
+        <div className="py-2">
+          <Separator />
+        </div>
+        <Button type="button" variant="secondary" disabled={loading} className="w-full" onClick={handleGoogleSignIn}>
+          Continue with Google
         </Button>
       </form>
     </Form>
