@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Pause, Play, RotateCcw, Star, Heart } from 'lucide-react';
+import { Pause, Play, RotateCcw, Star, Heart, Trophy } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // --- GAME CONSTANTS ---
@@ -18,6 +18,8 @@ const MAX_MOVE_SPEED = 450; // px/s
 const GROUND_FRICTION = 2200; // px/s^2 (applied to vx when grounded and no input)
 const JUMP_VELOCITY = 800; // px/s upward
 const RESTITUTION = 0.15; // small bounce
+const COYOTE_TIME_MS = 120; // grace period after leaving ground
+const JUMP_BUFFER_MS = 140; // accept jump shortly before landing
 
 // Types
 interface Vector2 { x: number; y: number }
@@ -47,6 +49,8 @@ const RedBallGame: React.FC = () => {
   const lastTimeRef = useRef<number>(0);
   const keysRef = useRef<Record<string, boolean>>({});
   const jumpQueuedRef = useRef<boolean>(false);
+  const lastGroundedAtRef = useRef<number>(-Infinity);
+  const lastJumpPressedAtRef = useRef<number>(-Infinity);
   const isClient = typeof window !== 'undefined';
   const isMobile = useIsMobile();
 
@@ -70,6 +74,8 @@ const RedBallGame: React.FC = () => {
   const [lives, setLives] = useState<number>(3);
   const [collectedStars, setCollectedStars] = useState<number>(0);
   const [totalStars, setTotalStars] = useState<number>(0);
+  const [score, setScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(0);
 
   // Mobile controls
   const [mobileMove, setMobileMove] = useState<'left' | 'right' | null>(null);
@@ -110,6 +116,7 @@ const RedBallGame: React.FC = () => {
 
   const startGame = () => {
     setCollectedStars(0);
+    setScore(0);
     setLives(3);
     buildLevel();
     resetPlayer();
@@ -131,6 +138,7 @@ const RedBallGame: React.FC = () => {
       keysRef.current[e.key.toLowerCase()] = true;
       if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
         jumpQueuedRef.current = true;
+        lastJumpPressedAtRef.current = (typeof performance !== 'undefined' ? performance.now() : Date.now());
       }
       if (e.key === 'p') {
         setState((s) => (s === 'PLAYING' ? 'PAUSED' : s === 'PAUSED' ? 'PLAYING' : s));
@@ -180,12 +188,18 @@ const RedBallGame: React.FC = () => {
         // Gravity
         next.vel.y += GRAVITY * dt;
 
-        // Jump
-        if (jumpQueuedRef.current && prev.isOnGround) {
+        // Jump handling (coyote time + jump buffer)
+        const nowMs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        const canCoyote = nowMs - lastGroundedAtRef.current <= COYOTE_TIME_MS;
+        const hasBufferedJump = nowMs - lastJumpPressedAtRef.current <= JUMP_BUFFER_MS;
+        if ((jumpQueuedRef.current || hasBufferedJump) && (prev.isOnGround || canCoyote)) {
           next.vel.y = -JUMP_VELOCITY;
           next.isOnGround = false;
+          jumpQueuedRef.current = false;
+          lastJumpPressedAtRef.current = -Infinity; // consume
+        } else {
+          jumpQueuedRef.current = false;
         }
-        jumpQueuedRef.current = false;
 
         // Integrate position
         next.pos.x += next.vel.x * dt;
@@ -222,6 +236,7 @@ const RedBallGame: React.FC = () => {
               next.pos.y -= overlapY;
               next.vel.y = -Math.abs(next.vel.y) * RESTITUTION;
               next.isOnGround = true;
+              lastGroundedAtRef.current = (typeof performance !== 'undefined' ? performance.now() : Date.now());
             }
           }
         }
@@ -283,12 +298,14 @@ const RedBallGame: React.FC = () => {
           if (circleRectIntersect({ x: next.pos.x, y: next.pos.y, r: next.r }, { x: s.x - s.r, y: s.y - s.r, w: s.r * 2, h: s.r * 2 })) {
             s.collected = true;
             setCollectedStars((c) => c + 1);
+            setScore((sc) => sc + 10);
           }
           return s;
         });
 
         // Goal
         if (circleRectIntersect({ x: next.pos.x, y: next.pos.y, r: next.r }, goalRef.current)) {
+          setScore((sc) => sc + 100);
           setState('LEVEL_COMPLETE');
         }
 
@@ -399,7 +416,23 @@ const RedBallGame: React.FC = () => {
   }, [state, isClient, mobileMove, restartAfterDeath, player]);
 
   // Build level initially
-  useEffect(() => { if (isClient) buildLevel(); }, [isClient, buildLevel]);
+  useEffect(() => {
+    if (!isClient) return;
+    buildLevel();
+    // Load high score
+    try {
+      const saved = localStorage.getItem('redball_high_score');
+      if (saved) setHighScore(Number(saved) || 0);
+    } catch {}
+  }, [isClient, buildLevel]);
+
+  // Persist high score when beating it
+  useEffect(() => {
+    if (score > highScore) {
+      setHighScore(score);
+      try { localStorage.setItem('redball_high_score', String(score)); } catch {}
+    }
+  }, [score, highScore]);
 
   // UI
   return (
@@ -452,14 +485,16 @@ const RedBallGame: React.FC = () => {
                       {state === 'LEVEL_COMPLETE' && (
                         <>
                           <h3 className="text-2xl text-green-400 mb-2">LEVEL COMPLETE!</h3>
-                          <p className="text-sm text-gray-200 mb-4">STARS: {collectedStars} / {totalStars}</p>
+                          <p className="text-sm text-gray-200">STARS: {collectedStars} / {totalStars}</p>
+                          <p className="text-sm text-yellow-300 mb-4">SCORE: {score} {score >= highScore ? '(NEW BEST!)' : ''}</p>
                           <Button onClick={startGame} className="bg-red-400 text-black hover:bg-red-300">PLAY AGAIN</Button>
                         </>
                       )}
                       {state === 'GAME_OVER' && (
                         <>
                           <h3 className="text-2xl text-red-500 mb-2">GAME OVER</h3>
-                          <p className="text-sm text-gray-200 mb-4">STARS: {collectedStars} / {totalStars}</p>
+                          <p className="text-sm text-gray-200">STARS: {collectedStars} / {totalStars}</p>
+                          <p className="text-sm text-yellow-300 mb-4">SCORE: {score}  BEST: {highScore}</p>
                           <Button onClick={startGame} className="bg-red-400 text-black hover:bg-red-300">RETRY</Button>
                         </>
                       )}
@@ -474,8 +509,9 @@ const RedBallGame: React.FC = () => {
                 )}
 
                 {/* HUD */}
-                <div className="absolute top-2 left-2 flex items-center gap-3 text-xs">
+                <div className="absolute top-2 left-2 flex items-center gap-2 text-xs">
                   <Badge variant="outline" className="border-red-400/60 text-red-300">STARS <span className="ml-2">{collectedStars} / {totalStars}</span></Badge>
+                  <Badge variant="outline" className="border-yellow-400/60 text-yellow-300">SCORE <span className="ml-2">{score}</span></Badge>
                 </div>
                 <div className="absolute top-2 right-2 flex items-center gap-1">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -490,6 +526,19 @@ const RedBallGame: React.FC = () => {
         </div>
 
         <aside className="space-y-4">
+          <Card className="bg-gray-800 border-2 border-yellow-300 shadow-[4px_4px_0px_#FBC02D]">
+            <CardHeader className="pb-2"><CardTitle className="text-yellow-300 text-sm">SCORE BOARD</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-2 gap-3 text-center">
+              <div className="p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-3xl font-bold text-white">{score}</div>
+                <div className="text-xs text-yellow-400/80">SCORE</div>
+              </div>
+              <div className="p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="flex items-center justify-center gap-1 text-3xl font-bold text-yellow-300"><Trophy className="w-5 h-5" />{highScore}</div>
+                <div className="text-xs text-yellow-400/80">BEST</div>
+              </div>
+            </CardContent>
+          </Card>
           <Card className="bg-gray-800 border-2 border-red-300">
             <CardHeader className="pb-2"><CardTitle className="text-red-300 text-sm">HOW TO PLAY</CardTitle></CardHeader>
             <CardContent className="text-xs space-y-2 text-gray-300">
