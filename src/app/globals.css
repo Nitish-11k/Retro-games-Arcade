@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 8%; /* CRT Black-ish */
+    --foreground: 45 100% 90%; /* Light Beige */
+    --card: 0 0% 12%;
+    --card-foreground: 45 100% 90%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 45 100% 90%;
+    --primary: 48 100% 50%; /* Neon Yellow */
+    --primary-foreground: 0 0% 5%;
+    --secondary: 24 100% 50%; /* Hot Orange */
+    --secondary-foreground: 0 0% 5%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 24 100% 50%; /* Hot Orange */
+    --accent-foreground: 0 0% 5%;
+    --destructive: 0 100% 50%; /* Vivid Red */
+    --destructive-foreground: 45 100% 90%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 48 100% 50%; /* Neon Yellow */
+    --radius: 0.25rem;
+    
+    /* Custom color variables for the game */
+    --neon-yellow: #FFCC00;
+    --vivid-red: #FF0000;
+    --crt-black: #1C0000;
+    --hot-orange: #FF6600;
+    --light-beige: #FFF2CC;
+  }
+
+  .dark {
+    --background: 0 0% 8%; /* CRT Black-ish */
+    --foreground: 45 100% 90%; /* Light Beige */
+    --card: 0 0% 12%;
+    --card-foreground: 45 100% 90%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 45 100% 90%;
+    --primary: 48 100% 50%; /* Neon Yellow */
+    --primary-foreground: 0 0% 5%;
+    --secondary: 24 100% 50%; /* Hot Orange */
+    --secondary-foreground: 0 0% 5%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 24 100% 50%; /* Hot Orange */
+    --accent-foreground: 0 0% 5%;
+    --destructive: 0 100% 50%; /* Vivid Red */
+    --destructive-foreground: 45 100% 90%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 48 100% 50%; /* Neon Yellow */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for retro gaming */
+.font-retro {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixel-border {
+  border-style: solid;
+  border-width: 4px;
+  image-rendering: pixelated;
+}
+
+.retro-shadow {
+  box-shadow: 4px 4px 0px rgba(255, 102, 0, 0.5);
+}
