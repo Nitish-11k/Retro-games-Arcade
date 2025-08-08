@@ -299,51 +299,7 @@ export default function TetrisGame() {
   return (
     <div className="min-h-screen bg-black text-green-400 p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Left Side Panel */}
-          <div className="lg:col-span-1 space-y-4">
-            {/* Score Panel */}
-            <Card className="bg-gray-900 border-green-400 border-2">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-sm">SCORE</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span>CURRENT:</span>
-                  <span className="text-yellow-400">{score.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span>HIGH:</span>
-                  <span className="text-red-400">{highScore.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span>LEVEL:</span>
-                  <span className="text-blue-400">{level}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span>LINES:</span>
-                  <span className="text-purple-400">{lines}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Controls Info */}
-            <Card className="bg-gray-900 border-green-400 border-2">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-sm">CONTROLS</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1 text-xs">
-                <div>A/D or ←/→: MOVE</div>
-                <div>W or ↑: ROTATE</div>
-                <div>S or ↓: SOFT DROP</div>
-                <div>SPACE: HARD DROP</div>
-                <div>P: PAUSE</div>
-                <div>G: TOGGLE GHOST</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Game Board - Centered */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 flex justify-center">
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="text-center pb-2">
@@ -351,7 +307,6 @@ export default function TetrisGame() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="relative flex justify-center">
-                  {/* Game Grid */}
                   <div 
                     className="inline-block border-4 border-green-400 bg-black p-3"
                     style={{ 
@@ -377,7 +332,6 @@ export default function TetrisGame() {
                     ))}
                   </div>
 
-                  {/* Game Over/Pause Overlay */}
                   {(gameOver || isPaused || !gameStarted) && (
                     <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
                       <div className="text-center">
@@ -404,7 +358,6 @@ export default function TetrisGame() {
                   )}
                 </div>
 
-                {/* Controls */}
                 <div className="mt-6 grid grid-cols-4 gap-3">
                   <Button 
                     onClick={() => movePiece('left')}
@@ -439,9 +392,31 @@ export default function TetrisGame() {
             </Card>
           </div>
 
-          {/* Right Side Panel */}
-          <div className="lg:col-span-1 space-y-4">
-            {/* Next Piece */}
+          <aside className="lg:col-span-1 space-y-4">
+            <Card className="bg-gray-900 border-green-400 border-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-green-400 text-sm">SCORE</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span>CURRENT:</span>
+                  <span className="text-yellow-400">{score.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>HIGH:</span>
+                  <span className="text-red-400">{highScore.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>LEVEL:</span>
+                  <span className="text-blue-400">{level}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span>LINES:</span>
+                  <span className="text-purple-400">{lines}</span>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
                 <CardTitle className="text-green-400 text-sm">NEXT</CardTitle>
@@ -469,7 +444,20 @@ export default function TetrisGame() {
               </CardContent>
             </Card>
 
-            {/* Game Actions */}
+            <Card className="bg-gray-900 border-green-400 border-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-green-400 text-sm">CONTROLS</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1 text-xs">
+                <div>A/D or ←/→: MOVE</div>
+                <div>W or ↑: ROTATE</div>
+                <div>S or ↓: SOFT DROP</div>
+                <div>SPACE: HARD DROP</div>
+                <div>P: PAUSE</div>
+                <div>G: TOGGLE GHOST</div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardContent className="p-4 space-y-2">
                 <Button 
@@ -496,7 +484,7 @@ export default function TetrisGame() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </aside>
         </div>
       </div>
     </div>
