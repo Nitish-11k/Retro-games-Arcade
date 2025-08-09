@@ -10,8 +10,6 @@ import TetrisCard from '@/components/games/tetris-card';
 import PacManCard from '@/components/games/pac-man-card';
 import VoidVanguardCard from '@/components/games/void-vanguard-card';
 import MarioRunnerCard from '@/components/games/mario-runner-card';
-import RedBallCard from '@/components/games/red-ball-card';
-import RetroMustafaCard from '@/components/games/retro-mustafa-card';
 
 const games: Game[] = [
   { id: 'flappy-pixel', title: 'Flappy Pixel', description: 'Flap your way through the pixel pipes!', image: 'https://placehold.co/300x200.png', dataAiHint: 'flappy bird retro', instructions: 'Click the mouse or press the spacebar to make the bird jump. Avoid the pipes!' },
@@ -51,12 +49,6 @@ const GameGallery = () => {
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
           <MarioRunnerCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <RedBallCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <RetroMustafaCard />
         </div>
         
         
