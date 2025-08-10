@@ -583,9 +583,6 @@ const PixelPaddle: React.FC = () => {
         <p className="text-sm text-green-400">A RETRO BREAKOUT ADVENTURE</p>
       </header>
       
-      <div className="mb-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-        <p className="text-xs text-gray-500">ADVERTISEMENT</p>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
@@ -777,9 +774,7 @@ const PixelPaddle: React.FC = () => {
         </aside>
       </div>
       
-      <footer className="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-        <p className="text-xs text-gray-500">FOOTER ADVERTISEMENT</p>
-      </footer>
+      
 
       {/* Mobile Controls */}
       {isMobile && gameState === 'PLAYING' && (

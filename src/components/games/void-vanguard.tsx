@@ -818,15 +818,10 @@ export default function VoidVanguard() {
                 <p className="text-sm text-green-400">A RETRO SPACE SHOOTER</p>
             </header>
             
-            <div className="mb-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-                <p className="text-xs text-gray-500">ADVERTISEMENT</p>
-            </div>
 
             <VoidVanguardGame />
 
-            <footer className="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-                <p className="text-xs text-gray-500">FOOTER ADVERTISEMENT</p>
-            </footer>
+            
         </div>
     );
 }

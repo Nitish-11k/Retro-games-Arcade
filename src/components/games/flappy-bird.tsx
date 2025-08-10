@@ -62,9 +62,6 @@ const FlappyBirdGame = () => {
         <p className="text-sm text-green-400">A RETRO FLYING ADVENTURE</p>
       </header>
       
-      <div className="mb-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-        <p className="text-xs text-gray-500">ADVERTISEMENT</p>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
@@ -157,9 +154,7 @@ const FlappyBirdGame = () => {
         </aside>
       </div>
       
-      <footer className="mt-6 p-4 border-2 border-dashed border-gray-700 text-center bg-gray-800">
-        <p className="text-xs text-gray-500">FOOTER ADVERTISEMENT</p>
-      </footer>
+      
     </div>
   );
 };

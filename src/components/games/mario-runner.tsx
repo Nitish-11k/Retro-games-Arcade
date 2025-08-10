@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MarioRunnerEngine, PlayerState, ObjectType, GameObject, Player } from '@/lib/mario-runner-engine';
-import AdPlaceholder from '@/components/ad-placeholder';
 import { RotateCcw, Play } from 'lucide-react';
 
 const MarioRunner: React.FC = () => {
@@ -276,9 +275,7 @@ const MarioRunner: React.FC = () => {
         <p className="text-sm text-yellow-400">A RETRO RUNNING ADVENTURE</p>
       </header>
       
-      <div className="mb-6">
-        <AdPlaceholder />
-      </div>
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
@@ -396,9 +393,7 @@ const MarioRunner: React.FC = () => {
         </aside>
       </div>
       
-      <footer className="mt-6">
-        <AdPlaceholder />
-      </footer>
+      
     </div>
   );
 };
