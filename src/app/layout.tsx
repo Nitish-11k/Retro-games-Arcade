@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: 'Retro Arcade Zone',
     template: '%s | Retro Arcade Zone',
   },
-  description: 'Play free retro browser games like Tetris, Pac‑Man, Flappy Bird, Snake and more. No downloads. Just instant arcade fun!',
+  description: 'Step back in time with Retro Arcade Zone! Play the best free retro browser games instantly. Enjoy classics like Tetris, Pac-Man, and Snake right in your browser—no downloads required.',
   keywords: [
     // Core & General
     'retro games',
@@ -136,7 +136,10 @@ export default function RootLayout({
               url: 'https://retroarcade.in',
               logo: 'https://retroarcade.in/favicon.ico',
               sameAs: [
-                // Add your social profiles when available
+                "https://twitter.com/YourTwitterHandle",
+                "https://www.facebook.com/YourFacebookPage",
+                "https://www.instagram.com/YourInstagramProfile",
+                "https://www.youtube.com/YourYouTubeChannel"
               ],
             }),
           }}
