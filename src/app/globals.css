@@ -62,14 +62,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
 }
 
 /* Custom utility classes for retro gaming */
-.font-retro {
-  font-family: 'Press Start 2P', cursive;
-}
-
 .pixel-border {
   border-style: solid;
   border-width: 4px;

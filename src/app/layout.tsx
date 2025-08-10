@@ -1,7 +1,20 @@
 import type { Metadata, Viewport } from 'next';
-import { Toaster } from "@/components/ui/toaster"
+import { Press_Start_2P, Inter } from 'next/font/google';
+import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/use-auth';
 import './globals.css';
+
+const pressStart2P = Press_Start_2P({
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
+  variable: '--font-press-start-2p',
+});
+
+const fontSans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://retroarcade.in'),
@@ -109,11 +122,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className={`${pressStart2P.variable} ${fontSans.variable} dark scroll-smooth`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+        {/* The <link> tags for Google Fonts are no longer needed and will be removed. */}
         {/* Structured Data: Organization */}
         <script
           type="application/ld+json"
