@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   description: 'Play free retro browser games like Tetris, Pac‑Man, Flappy Bird, Snake and more. No downloads. Just instant arcade fun!',
   keywords: [
     'retro games',
+    'retro arcade',
+    'retro arcade games',
+    'retro arcade games online',
+    'retro arcade games free',
     'browser games',
     'free games',
     'tetris online',
