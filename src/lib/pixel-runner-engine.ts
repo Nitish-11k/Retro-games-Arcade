@@ -4,8 +4,8 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 
 // Game constants
 const GRAVITY = 0.6;
-const JUMP_FORCE = -15;
-const DOUBLE_JUMP_FORCE = -12;
+const JUMP_FORCE = -12;
+const DOUBLE_JUMP_FORCE = -10;
 const MOVE_SPEED = 5;
 const PLAYER_WIDTH = 32;
 const PLAYER_HEIGHT = 48;
@@ -40,8 +40,6 @@ export interface Player {
   state: PlayerState;
   grounded: boolean;
   jumpCount: number;
-  lastJumpPressedTime: number;
-  lastGroundedTime: number;
   health: number;
   invulnerable: number;
   score: number;
@@ -54,6 +52,7 @@ const usePixelRunnerEngine = () => {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [isGameReady, setIsGameReady] = useState(false);
+  const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.Falling);
 
   const playerRef = useRef<Player>({
     position: { x: 100, y: 300 },
@@ -62,8 +61,6 @@ const usePixelRunnerEngine = () => {
     state: PlayerState.Falling,
     grounded: false,
     jumpCount: 0,
-    lastJumpPressedTime: 0,
-    lastGroundedTime: 0,
     health: 3,
     invulnerable: 0,
     score: 0,
@@ -83,14 +80,13 @@ const usePixelRunnerEngine = () => {
       state: PlayerState.Falling,
       grounded: false,
       jumpCount: 0,
-      lastJumpPressedTime: 0,
-      lastGroundedTime: 0,
       health: 3,
       invulnerable: 0,
       score: 0,
     };
     setScore(0);
     setLives(3);
+    setPlayerState(PlayerState.Falling);
     generateInitialWorld();
   }, []);
 
@@ -111,11 +107,13 @@ const usePixelRunnerEngine = () => {
   }, [generateInitialWorld]);
 
   const update = useCallback((deltaTime: number) => {
+    if (gameState !== 'running') return;
+    const deltaSeconds = deltaTime / 1000;
     const player = playerRef.current;
     
     // Player movement and physics
-    player.velocity.y += GRAVITY;
-    player.position.y += player.velocity.y;
+    player.velocity.y += GRAVITY * deltaSeconds;
+    player.position.y += player.velocity.y * deltaSeconds;
     
     // Automatic forward movement
     player.position.x += MOVE_SPEED;
@@ -169,7 +167,7 @@ const usePixelRunnerEngine = () => {
       ) {
         // Narrow-phase check
         if (obj.isSolid) {
-          if (player.velocity.y >= 0 && player.position.y + player.bounds.height - player.velocity.y <= obj.position.y) {
+          if (player.velocity.y >= 0 && player.position.y + player.bounds.height - player.velocity.y * deltaSeconds <= obj.position.y) {
             player.position.y = obj.position.y - player.bounds.height;
             player.velocity.y = 0;
             player.grounded = true;
@@ -188,6 +186,10 @@ const usePixelRunnerEngine = () => {
       }
     });
 
+    if (!player.grounded && player.velocity.y > 0) {
+        player.state = PlayerState.Falling;
+    }
+
     if (player.invulnerable > 0) {
       player.invulnerable -= deltaTime;
     }
@@ -201,8 +203,9 @@ const usePixelRunnerEngine = () => {
     }
     
     setScore(player.score);
+    setPlayerState(player.state);
 
-  }, []);
+  }, [gameState, lives]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -268,14 +271,19 @@ const usePixelRunnerEngine = () => {
   }, [gameState, gameLoop]);
 
   const handleJump = useCallback(() => {
+    if (gameState !== 'running') return;
     const player = playerRef.current;
-    if (player.jumpCount < 2) {
-      player.velocity.y = player.jumpCount === 0 ? JUMP_FORCE : DOUBLE_JUMP_FORCE;
-      player.jumpCount++;
+    if (player.grounded) {
+      player.velocity.y = JUMP_FORCE;
       player.grounded = false;
-      player.state = player.jumpCount === 1 ? PlayerState.Jumping : PlayerState.DoubleJumping;
+      player.jumpCount = 1;
+      player.state = PlayerState.Jumping;
+    } else if (player.jumpCount < 2) {
+      player.velocity.y = DOUBLE_JUMP_FORCE;
+      player.jumpCount++;
+      player.state = PlayerState.DoubleJumping;
     }
-  }, []);
+  }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -312,6 +320,7 @@ const usePixelRunnerEngine = () => {
     lives,
     startGame,
     isGameReady,
+    playerState,
   };
 };
 

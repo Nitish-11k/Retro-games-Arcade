@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import usePixelRunnerEngine from '@/lib/pixel-runner-engine';
+import usePixelRunnerEngine, { PlayerState } from '@/lib/pixel-runner-engine';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +14,7 @@ const PixelRunnerGame = () => {
     lives,
     startGame,
     isGameReady,
+    playerState,
   } = usePixelRunnerEngine();
 
   if (!isGameReady) {
@@ -33,6 +34,7 @@ const PixelRunnerGame = () => {
           <div className="flex items-center space-x-6">
             <div className="text-lg font-mono text-red-300">Score: {score}</div>
             <div className="text-lg font-mono text-red-300">Lives: {lives}</div>
+            <div className="text-lg font-mono text-yellow-300">State: {PlayerState[playerState]}</div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
