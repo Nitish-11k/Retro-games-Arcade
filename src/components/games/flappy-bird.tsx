@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Play } from 'lucide-react';
 import { Game } from '@/lib/flappy-bird-utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const FlappyBirdGame = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -13,6 +14,7 @@ const FlappyBirdGame = () => {
   const [score, setScore] = useState(0);
   const [speed, setSpeed] = useState(2.0);
   const [gameState, setGameState] = useState<'playing' | 'gameOver'>('playing');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,7 +22,7 @@ const FlappyBirdGame = () => {
 
     const game = new Game(canvas);
     gameRef.current = game;
-    game.run();
+    game.start();
 
     // Update score and speed periodically
     const interval = setInterval(() => {
@@ -33,13 +35,13 @@ const FlappyBirdGame = () => {
 
     return () => {
       clearInterval(interval);
-      game.removeEventListeners();
+      game.stop();
     };
   }, []);
 
   const resetGame = () => {
     if (gameRef.current) {
-      gameRef.current.removeEventListeners();
+      gameRef.current.stop();
     }
     
     const canvas = canvasRef.current;
@@ -47,7 +49,7 @@ const FlappyBirdGame = () => {
 
     const game = new Game(canvas);
     gameRef.current = game;
-    game.run();
+    game.start();
     
     // Reset state
     setScore(0);
@@ -56,14 +58,29 @@ const FlappyBirdGame = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+    <div className="flex flex-col items-center" style={{ fontFamily: "'Press Start 2P', monospace" }}>
       <header className="mb-6 text-center">
         <h1 className="text-3xl md:text-4xl text-blue-300 mb-2">FLAPPY BIRD</h1>
         <p className="text-sm text-green-400">A RETRO FLYING ADVENTURE</p>
       </header>
-      
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* Game Description */}
+      <div className="w-full max-w-4xl mb-6">
+        <Card className="bg-gray-800 border-2 border-blue-400">
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              Navigate your brave bird through an endless maze of green pipes in this classic arcade-style adventure! 
+              Tap the screen or press spacebar to make your bird flap its wings and soar upward. Master the art of timing 
+              as gravity constantly pulls you down - one wrong move and it's game over! Each pipe you successfully pass 
+              through earns you points, and the challenge intensifies as your speed gradually increases. With simple 
+              one-button controls and addictive gameplay, Flappy Bird tests your reflexes and patience. How high can 
+              you score in this pixelated flight of fury?
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full max-w-6xl">
         <div className="lg:col-span-3">
           <Card className="bg-gray-800 border-2 border-blue-400 shadow-[8px_8px_0px_#1E40AF]">
             <CardHeader className="pb-4">
@@ -82,11 +99,11 @@ const FlappyBirdGame = () => {
                   ref={canvasRef} 
                   width="400" 
                   height="600" 
-                  className="border-4 border-blue-300 bg-gray-900"
+                  className="border-4 border-blue-300 bg-gray-900 cursor-pointer"
                   style={{ maxWidth: '100%', height: 'auto', touchAction: 'none' }}
                 />
                 {gameState === 'gameOver' && (
-                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
+                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center pointer-events-none">
                     <h3 className="text-2xl mb-2 font-bold text-red-500">GAME OVER</h3>
                     <p className="text-lg mb-2 text-gray-200">FINAL SCORE: {score}</p>
                     <p className="text-sm mb-4 text-blue-400">CLICK OR PRESS SPACE TO RESTART</p>
@@ -153,6 +170,33 @@ const FlappyBirdGame = () => {
           </Card>
         </aside>
       </div>
+
+      {/* Mobile Controls */}
+      {isMobile && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+          <Button
+            onTouchStart={(e) => {
+              e.preventDefault();
+              if (gameRef.current) {
+                gameRef.current.handleInput();
+              }
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              if (gameRef.current) {
+                gameRef.current.handleInput();
+              }
+            }}
+            className="select-none bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-300 hover:to-blue-500 active:from-blue-600 active:to-blue-700 text-white font-bold rounded-full w-24 h-24 text-3xl border-4 border-blue-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
+            style={{ 
+              boxShadow: '0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+            }}
+          >
+            <span className="drop-shadow-sm">TAP</span>
+          </Button>
+        </div>
+      )}
       
       
     </div>

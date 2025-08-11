@@ -31,6 +31,13 @@ const FlappyBirdPage = () => {
           url="https://retroarcade.in/games/flappy-bird"
           genre="Arcade"
         />
+        <div className="text-center mb-8">
+            <h2 className="text-4xl font-headline text-blue-300">Flappy Bird</h2>
+            <p className="text-lg text-gray-400 mt-2 max-w-3xl mx-auto">
+                Get ready for a test of timing and reflexes in this minimalist classic! Flappy Bird sends you on an endless journey through a world of green pipes. The goal is simple: tap or click to make your bird flap its wings and navigate through the gaps. But be warned, the physics are tricky, and a single mistake will send you back to the start.
+                As you progress, the speed increases, pushing your skills to the limit. Perfect for a quick gaming session, Flappy Bird is all about chasing that next high score. How long can you survive the pipe maze?
+            </p>
+        </div>
         <FlappyBirdGame />
       </main>
       <Footer />

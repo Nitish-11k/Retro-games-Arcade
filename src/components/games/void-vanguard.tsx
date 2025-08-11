@@ -10,7 +10,8 @@ import React, { useState, useEffect, useReducer, useCallback, useRef, createCont
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Play, RotateCcw, Shield, Zap, ChevronsUp } from 'lucide-react';
+import { Play, RotateCcw, Shield, Zap, ChevronsUp, ArrowLeft, ArrowRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // --- 1. CONSTANTS & CONFIGURATION ---
 const GAME_WIDTH = 800;
@@ -691,6 +692,28 @@ const GameCanvas: React.FC = () => {
     const { state, dispatch } = useContext(GameContext)!;
     const keysPressed = useKeyboardInput();
     const quadtree = useRef(new Quadtree({ x: 0, y: 0, width: GAME_WIDTH, height: GAME_HEIGHT })).current;
+    const isMobile = useIsMobile();
+    const [mobileMove, setMobileMove] = useState<'left' | 'right' | null>(null);
+    const [mobileShoot, setMobileShoot] = useState(false);
+
+    // Add mobile controls to the keys pressed
+    useEffect(() => {
+        if (mobileMove === 'left') {
+            keysPressed.current.add('arrowleft');
+        } else {
+            keysPressed.current.delete('arrowleft');
+        }
+        if (mobileMove === 'right') {
+            keysPressed.current.add('arrowright');
+        } else {
+            keysPressed.current.delete('arrowright');
+        }
+        if (mobileShoot) {
+            keysPressed.current.add(' ');
+        } else {
+            keysPressed.current.delete(' ');
+        }
+    }, [mobileMove, mobileShoot, keysPressed]);
 
     useGameLoop(useCallback((dt: number) => {
         dispatch({ type: 'GAME_TICK', payload: { dt, keys: keysPressed.current, quadtree } });
@@ -714,6 +737,54 @@ const GameCanvas: React.FC = () => {
             {state.status === 'GAME_OVER' && <GameOverScreen score={state.score} onRestart={() => dispatch({ type: 'RESET_GAME' })} />}
             {state.status === 'LEVEL_COMPLETE' && <LevelCompleteScreen level={state.level} onNext={() => dispatch({ type: 'NEXT_LEVEL' })} />}
             {state.status === 'YOU_WIN' && <YouWinScreen onRestart={() => dispatch({ type: 'RESET_GAME' })} />}
+            
+            {/* Mobile Controls */}
+            {isMobile && state.status === 'PLAYING' && (
+                <div className="absolute bottom-4 left-0 right-0 flex justify-between px-4">
+                    {/* Movement Controls */}
+                    <div className="flex gap-2">
+                        <Button
+                            onTouchStart={() => setMobileMove('left')}
+                            onTouchEnd={() => setMobileMove(null)}
+                            onMouseDown={() => setMobileMove('left')}
+                            onMouseUp={() => setMobileMove(null)}
+                            className="select-none bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-16 h-16 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                            style={{ 
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                            }}
+                        >
+                            <ArrowLeft size={24} />
+                        </Button>
+                        <Button
+                            onTouchStart={() => setMobileMove('right')}
+                            onTouchEnd={() => setMobileMove(null)}
+                            onMouseDown={() => setMobileMove('right')}
+                            onMouseUp={() => setMobileMove(null)}
+                            className="select-none bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-16 h-16 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                            style={{ 
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                            }}
+                        >
+                            <ArrowRight size={24} />
+                        </Button>
+                    </div>
+                    
+                    {/* Shoot Control */}
+                    <Button
+                        onTouchStart={() => setMobileShoot(true)}
+                        onTouchEnd={() => setMobileShoot(false)}
+                        onMouseDown={() => setMobileShoot(true)}
+                        onMouseUp={() => setMobileShoot(false)}
+                        className="select-none bg-gradient-to-b from-red-400 to-red-600 hover:from-red-300 hover:to-red-500 active:from-red-600 active:to-red-700 text-white font-bold w-20 h-16 border-2 border-red-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                        style={{ 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                        }}
+                    >
+                        <span className="drop-shadow-sm text-sm">FIRE</span>
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };
@@ -744,6 +815,10 @@ const useKeyboardInput = () => {
 
 const VoidVanguardGame = () => {
     const [state, dispatch] = useReducer(gameReducer, undefined, createInitialState);
+    const isMobile = useIsMobile();
+    const [mobileMove, setMobileMove] = useState<'left' | 'right' | null>(null);
+    const [mobileShoot, setMobileShoot] = useState(false);
+    
     return (
         <GameContext.Provider value={{ state, dispatch }}>
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -817,7 +892,23 @@ export default function VoidVanguard() {
                 <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">VOID VANGUARD</h1>
                 <p className="text-sm text-green-400">A RETRO SPACE SHOOTER</p>
             </header>
-            
+
+            {/* Game Description */}
+            <div className="max-w-4xl mx-auto mb-6">
+                <Card className="bg-gray-800 border-2 border-yellow-400">
+                    <CardContent className="p-4">
+                        <p className="text-sm text-gray-300 text-center leading-relaxed">
+                            Defend the galaxy as the ultimate Void Vanguard in this intense retro space shooter! 
+                            Pilot your advanced starfighter through waves of alien invaders, each with unique attack patterns 
+                            and behaviors. Collect powerful power-ups including rapid fire, spread shots, and protective shields 
+                            to enhance your combat abilities. Face massive boss enemies that require strategy and skill to defeat. 
+                            The action intensifies as enemy formations become more complex and aggressive. Use precise movement 
+                            and well-timed shots to survive increasingly challenging waves. Every enemy destroyed earns points, 
+                            but survival is your primary mission. Can you become the legendary Void Vanguard?
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
 
             <VoidVanguardGame />
 

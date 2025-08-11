@@ -381,7 +381,23 @@ const PixelSlither: React.FC = () => {
         <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">PIXEL SLITHER</h1>
         <p className="text-sm text-green-400">A RETRO SNAKE ADVENTURE</p>
       </header>
-      
+
+      {/* Game Description */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400">
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              Guide your serpentine friend through a digital garden feast in this timeless arcade classic! 
+              Start as a tiny snake and grow longer with every delicious fruit you consume. Navigate the grid-based 
+              world using arrow keys or swipe gestures, but beware - one wrong move into your own tail or the walls 
+              spells instant doom! Choose your difficulty level to control the pace, from leisurely crawling to 
+              lightning-fast slithering. Master the art of strategic movement as your snake becomes increasingly 
+              unwieldy. With multiple wall behaviors and speed settings, every game offers a fresh challenge. 
+              How long can you grow before running out of space?
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">

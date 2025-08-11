@@ -582,7 +582,23 @@ const PixelPaddle: React.FC = () => {
         <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">PIXEL PADDLE</h1>
         <p className="text-sm text-green-400">A RETRO BREAKOUT ADVENTURE</p>
       </header>
-      
+
+      {/* Game Description */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400">
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              Bounce your way to victory in this classic brick-breaking extravaganza! Control your paddle to keep the 
+              ball in play while systematically destroying colorful brick formations. Each brick type requires different 
+              hits to break, and stronger bricks yield higher points. Watch for special power-ups that drop from golden 
+              bricks - grab them to unlock wider paddles, slower balls, and other game-changing abilities! The physics 
+              are precise: hit the ball with different parts of your paddle to control its angle and strategy. Complete 
+              levels to face increasingly complex brick patterns and faster gameplay. Can you master the perfect angles 
+              and clear every last brick?
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">

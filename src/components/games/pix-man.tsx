@@ -5,7 +5,8 @@ import { MAP, GHOSTS, PLAYER, TILE_SIZE, POWER_PELLET_TIME, Player, Ghost, Ghost
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { RotateCcw, Play } from 'lucide-react';
+import { RotateCcw, Play, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 enum GameState {
   START_SCREEN,
@@ -21,6 +22,7 @@ const scatterTime = 7000; // 7 seconds
 
 const PixManGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isMobile = useIsMobile();
   const [gameState, setGameState] = useState<GameState>(GameState.START_SCREEN);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
@@ -68,9 +70,9 @@ const PixManGame = () => {
   }, []);
 
   const resetGame = useCallback(() => {
-    resetLevel();
     setScore(0);
     setLives(3);
+    resetLevel();
     setGameState(GameState.START_SCREEN);
   }, [resetLevel]);
 
@@ -237,14 +239,14 @@ const PixManGame = () => {
   useEffect(() => {
     let lastTime = 0;
     const gameLoop = (timestamp: number) => {
-      if (!isGameStarted || gameOver || gameWon || isDying) {
-        stopGame();
-        return;
-      }
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
 
-      update(deltaTime);
+      // Ensure deltaTime is a reasonable value
+      if (!Number.isNaN(deltaTime) && deltaTime > 0) {
+        update(deltaTime);
+      }
+      
       draw();
       animationFrameId.current = requestAnimationFrame(gameLoop);
     };
@@ -268,7 +270,6 @@ const PixManGame = () => {
         }
       } else if (e.key === 'Enter') {
         if (gameState === GameState.START_SCREEN) {
-          resetLevel();
           setGameState(GameState.GAME_START_ANIMATION);
           stateTimer.current = 2000; // Ready! time
         } else if (gameState === GameState.GAME_OVER) {
@@ -292,14 +293,35 @@ const PixManGame = () => {
     resetGame();
   }, [resetGame]);
 
+  const handleMobileInput = (direction: { dx: number; dy: number }) => {
+    if (gameState === GameState.PLAYING && player.current) {
+      player.current.nextDirection = direction;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
       <header className="mb-6 text-center">
         <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">Pix-Man</h1>
         <p className="text-sm text-green-400">A RETRO MAZE ADVENTURE</p>
       </header>
-      
 
+      {/* Game Description */}
+      <div className="max-w-4xl mx-auto mb-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400">
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
+              Chomp your way through every dot to advance to the next level, but watch out - four unique ghosts with different 
+              personalities hunt you down. Grab the flashing power pellets to turn the tables and chase the ghosts for bonus points! 
+              Each ghost has its own strategy: Blinky chases relentlessly, Pinky tries to ambush, Inky flanks unpredictably, 
+              and Clyde plays it cautious. Master the maze, time your moves perfectly, and see how high you can score in this 
+              timeless arcade classic!
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
@@ -320,6 +342,18 @@ const PixManGame = () => {
               </div>
             </CardContent>
           </Card>
+          {isMobile && gameState === GameState.PLAYING && (
+            <div className="mt-4 flex justify-center items-center">
+                <div className="grid grid-cols-3 gap-2">
+                    <div></div>
+                    <Button onTouchStart={() => handleMobileInput({ dx: 0, dy: -1 })} className="bg-gray-700 active:bg-yellow-500"><ArrowUp /></Button>
+                    <div></div>
+                    <Button onTouchStart={() => handleMobileInput({ dx: -1, dy: 0 })} className="bg-gray-700 active:bg-yellow-500"><ArrowLeft /></Button>
+                    <Button onTouchStart={() => handleMobileInput({ dx: 0, dy: 1 })} className="bg-gray-700 active:bg-yellow-500"><ArrowDown /></Button>
+                    <Button onTouchStart={() => handleMobileInput({ dx: 1, dy: 0 })} className="bg-gray-700 active:bg-yellow-500"><ArrowRight /></Button>
+                </div>
+            </div>
+          )}
         </div>
 
         <aside className="space-y-4">
@@ -383,6 +417,64 @@ const PixManGame = () => {
           </Card>
         </aside>
       </div>
+
+      {/* Mobile Controls */}
+      {isMobile && (
+        <div className="fixed bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
+          <div className="relative pointer-events-auto">
+            {/* D-Pad Style Controls */}
+            <div className="relative w-32 h-32">
+              {/* Up */}
+              <Button
+                onTouchStart={() => handleMobileInput({ dx: 0, dy: -1 })}
+                onMouseDown={() => handleMobileInput({ dx: 0, dy: -1 })}
+                className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                style={{ 
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                }}
+              >
+                <ArrowUp size={20} />
+              </Button>
+              
+              {/* Down */}
+              <Button
+                onTouchStart={() => handleMobileInput({ dx: 0, dy: 1 })}
+                onMouseDown={() => handleMobileInput({ dx: 0, dy: 1 })}
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                style={{ 
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                }}
+              >
+                <ArrowDown size={20} />
+              </Button>
+              
+              {/* Left */}
+              <Button
+                onTouchStart={() => handleMobileInput({ dx: -1, dy: 0 })}
+                onMouseDown={() => handleMobileInput({ dx: -1, dy: 0 })}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                style={{ 
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                }}
+              >
+                <ArrowLeft size={20} />
+              </Button>
+              
+              {/* Right */}
+              <Button
+                onTouchStart={() => handleMobileInput({ dx: 1, dy: 0 })}
+                onMouseDown={() => handleMobileInput({ dx: 1, dy: 0 })}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                style={{ 
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                }}
+              >
+                <ArrowRight size={20} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       
     </div>

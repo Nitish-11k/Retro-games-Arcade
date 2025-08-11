@@ -5,6 +5,7 @@ import usePixelRunnerEngine, { PlayerState } from '@/lib/pixel-runner-engine';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PixelRunnerGame = () => {
   const {
@@ -16,6 +17,7 @@ const PixelRunnerGame = () => {
     isGameReady,
     playerState,
   } = usePixelRunnerEngine();
+  const isMobile = useIsMobile();
 
   if (!isGameReady) {
     return (
@@ -28,6 +30,23 @@ const PixelRunnerGame = () => {
 
   return (
     <div className="flex flex-col items-center">
+      {/* Game Description */}
+      <div className="w-full max-w-4xl mb-6">
+        <Card className="bg-gray-800 border-2 border-red-400">
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-300 text-center leading-relaxed">
+              Sprint through an endless procedurally-generated world in this high-octane platform adventure! 
+              Control a pixelated runner who must leap over obstacles, dodge enemies, and collect shiny coins 
+              while the pace continuously accelerates. Master the art of precise jumping and double-jumping to 
+              navigate increasingly challenging terrain. Each coin collected boosts your score, but one collision 
+              with an enemy or obstacle costs you a precious life. The world generates dynamically around you, 
+              ensuring no two runs are exactly alike. How far can you run before the relentless speed becomes 
+              too much to handle?
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="w-full max-w-4xl bg-black/50 border-2 border-red-500 shadow-lg shadow-red-500/20">
         <CardHeader className="flex flex-row items-center justify-between p-4 border-b-2 border-red-500">
           <CardTitle className="text-xl font-headline text-red-400">Pixel Runner</CardTitle>
@@ -58,6 +77,33 @@ const PixelRunnerGame = () => {
               {gameState === 'gameOver' ? 'Play Again' : 'JUMP'}
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Mobile Controls */}
+      {isMobile && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <Button
+            onTouchStart={(e) => {
+              e.preventDefault();
+              // Simulate spacebar keydown event
+              const spaceEvent = new KeyboardEvent('keydown', { code: 'Space' });
+              window.dispatchEvent(spaceEvent);
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              // Simulate spacebar keydown event
+              const spaceEvent = new KeyboardEvent('keydown', { code: 'Space' });
+              window.dispatchEvent(spaceEvent);
+            }}
+            className="select-none bg-gradient-to-b from-red-400 to-red-600 hover:from-red-300 hover:to-red-500 active:from-red-600 active:to-red-700 text-white font-bold rounded-full w-20 h-20 text-lg border-4 border-red-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
+            style={{ 
+              boxShadow: '0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+            }}
+          >
+            <span className="drop-shadow-sm">JUMP</span>
+          </Button>
         </div>
       )}
     </div>

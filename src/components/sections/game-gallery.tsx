@@ -10,29 +10,14 @@ const GameGallery = () => {
   return (
     <section id="games" className="py-16">
       <h2 className="text-3xl md:text-4xl font-headline text-center mb-12">Choose Your Challenge</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {/* Featured Games */}
-        <div className="sm:col-span-2 lg:col-span-1">
-          <PixelSlitherCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <PixelPaddleCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <FlappyBirdCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <PixelBoxCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <PixManCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <VoidVanguardCard />
-        </div>
-        <div className="sm:col-span-2 lg:col-span-1">
-          <PixelRunnerCard />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <PixelSlitherCard />
+        <PixelPaddleCard />
+        <FlappyBirdCard />
+        <PixelBoxCard />
+        <PixManCard />
+        <VoidVanguardCard />
+        <PixelRunnerCard />
       </div>
     </section>
   );

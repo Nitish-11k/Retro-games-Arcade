@@ -299,6 +299,23 @@ export default function PixelBoxGame() {
   return (
     <div className="min-h-screen bg-black text-green-400 p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
       <div className="max-w-7xl mx-auto">
+        {/* Game Description */}
+        <div className="mb-6">
+          <Card className="bg-gray-900 border-green-400 border-2">
+            <CardContent className="p-4">
+              <p className="text-sm text-gray-300 text-center leading-relaxed">
+                Stack, rotate, and clear your way to victory in this electrifying block-dropping puzzle! 
+                Seven unique tetromino shapes fall from above, and it's your job to fit them perfectly into 
+                horizontal lines. Rotate pieces with precision, slide them left and right, and use the hard drop 
+                for lightning-fast placement. Complete lines disappear and boost your score, but let the blocks 
+                reach the top and it's game over! As your level increases, pieces fall faster, testing your 
+                reflexes and spatial reasoning. The ghost piece shows you exactly where your block will land. 
+                Master the art of perfect placement and see how high you can score!
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 flex justify-center">
             <Card className="bg-gray-900 border-green-400 border-2">

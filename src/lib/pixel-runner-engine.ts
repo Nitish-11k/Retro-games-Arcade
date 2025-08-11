@@ -321,6 +321,7 @@ const usePixelRunnerEngine = () => {
     startGame,
     isGameReady,
     playerState,
+    handleJump,
   };
 };
 

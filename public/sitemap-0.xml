@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://retroarcade.in/sitemap.xml</loc><lastmod>2025-08-11T10:48:54.807Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/robots.txt</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/pixel-runner</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/flappy-bird</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/pix-man</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/about</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/pixel-paddle</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/void-vanguard</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/pixel-slither</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/privacy</loc><lastmod>2025-08-11T10:48:54.808Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in/games/pixel-box</loc><lastmod>2025-08-11T10:48:54.809Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://retroarcade.in</loc><lastmod>2025-08-11T10:48:54.809Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/robots.txt</loc><lastmod>2025-08-11T11:26:07.515Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/pixel-paddle</loc><lastmod>2025-08-11T11:26:07.516Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/sitemap.xml</loc><lastmod>2025-08-11T11:26:07.516Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/pix-man</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/void-vanguard</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/pixel-box</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/flappy-bird</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/pixel-runner</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/games/pixel-slither</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/privacy</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in/about</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://retroarcade.in</loc><lastmod>2025-08-11T11:26:07.517Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>
