@@ -1,10 +1,10 @@
 import PixelSlitherCard from '@/components/games/pixel-slither-card';
 import PixelPaddleCard from '@/components/games/pixel-paddle-card';
 import FlappyBirdCard from '@/components/games/flappy-bird-card';
-import TetrisCard from '@/components/games/tetris-card';
-import PacManCard from '@/components/games/pac-man-card';
+import PixelBoxCard from '@/components/games/pixel-box-card';
+import PixManCard from '@/components/games/pix-man-card';
 import VoidVanguardCard from '@/components/games/void-vanguard-card';
-import MarioRunnerCard from '@/components/games/mario-runner-card';
+import PixelRunnerCard from '@/components/games/pixel-runner-card';
 
 const GameGallery = () => {
   return (
@@ -22,16 +22,16 @@ const GameGallery = () => {
           <FlappyBirdCard />
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
-          <TetrisCard />
+          <PixelBoxCard />
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
-          <PacManCard />
+          <PixManCard />
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
           <VoidVanguardCard />
         </div>
         <div className="sm:col-span-2 lg:col-span-1">
-          <MarioRunnerCard />
+          <PixelRunnerCard />
         </div>
       </div>
     </section>

@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://retroarcade.in
+
+# Sitemaps
+Sitemap: https://retroarcade.in/sitemap.xml

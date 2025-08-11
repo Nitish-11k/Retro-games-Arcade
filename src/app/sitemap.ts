@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://retroarcade.in';
-  const staticRoutes = ['/', '/games/tetris', '/games/pac-man', '/games/flappy-bird', '/games/pixel-slither', '/games/pixel-paddle', '/games/void-vanguard', '/games/mario-runner'];
+  const staticRoutes = ['/', '/games/pixel-box', '/games/pix-man', '/games/flappy-bird', '/games/pixel-slither', '/games/pixel-paddle', '/games/void-vanguard', '/games/pixel-runner'];
 
   const now = new Date();
 

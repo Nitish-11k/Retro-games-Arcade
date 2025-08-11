@@ -22,9 +22,9 @@ import {
   type Position,
   type Tetromino,
   type GameStats
-} from '@/lib/tetris-utils'
+} from '@/lib/pixel-box-utils'
 
-export default function TetrisGame() {
+export default function PixelBoxGame() {
   const [grid, setGrid] = useState<number[][]>(createGrid())
   const [position, setPosition] = useState<Position>({ row: 0, col: 4 })
   const [currentPiece, setCurrentPiece] = useState<Tetromino>(getRandomTetromino())
@@ -303,7 +303,7 @@ export default function TetrisGame() {
           <div className="lg:col-span-3 flex justify-center">
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-green-400 text-2xl">TETRIS</CardTitle>
+                <CardTitle className="text-green-400 text-2xl">PIXEL BOX</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="relative flex justify-center">
@@ -349,7 +349,7 @@ export default function TetrisGame() {
                         )}
                         {!gameStarted && !gameOver && (
                           <>
-                            <div className="text-green-400 text-xl mb-2">TETRIS</div>
+                            <div className="text-green-400 text-xl mb-2">PIXEL BOX</div>
                             <div className="text-green-400 text-sm mb-4">PRESS SPACE TO START</div>
                           </>
                         )}

@@ -4,15 +4,13 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Play, Shield, Zap, Star } from 'lucide-react';
+import { Play, Star, Zap } from 'lucide-react';
 
 const VoidVanguardCard = () => {
   return (
-    <Card className="group hover:scale-105 transition-all duration-300 border-purple-500 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+    <Card className="group flex flex-col h-full hover:scale-105 transition-all duration-300 border-indigo-500 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
       <div className="relative">
-        {/* Space battle background */}
-        <div className="h-48 bg-black border-b-2 border-purple-500 relative overflow-hidden">
-          {/* Stars background */}
+        <div className="h-48 bg-black border-b-2 border-indigo-500 relative overflow-hidden flex items-center justify-center p-4">
           <div className="absolute inset-0">
             {Array.from({ length: 30 }).map((_, i) => (
               <div
@@ -28,67 +26,43 @@ const VoidVanguardCard = () => {
             ))}
           </div>
           
-          {/* Player ship */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-pulse">
-            <div className="w-8 h-12 bg-purple-400 relative" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}>
-              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-4 bg-cyan-400 animate-pulse"></div>
-            </div>
-          </div>
-          
-          {/* Enemy ships */}
-          <div className="absolute top-6 right-8 animate-bounce" style={{ animationDelay: '0.3s' }}>
-            <div className="w-6 h-8 bg-red-500 relative" style={{ clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)' }}></div>
-          </div>
-          
-          <div className="absolute top-12 left-12 animate-bounce" style={{ animationDelay: '0.7s' }}>
-            <div className="w-6 h-8 bg-red-500 relative" style={{ clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)' }}></div>
-          </div>
-          
-          {/* Projectiles */}
-          <div className="absolute top-1/3 left-1/3">
-            <div className="w-1 h-4 bg-cyan-400 animate-pulse"></div>
-          </div>
-          
-          <div className="absolute top-2/3 right-1/4">
-            <div className="w-1 h-4 bg-red-400 animate-pulse"></div>
-          </div>
-          
-          {/* Score display */}
-          <div className="absolute top-3 left-3 font-mono text-xs text-purple-400">
-            SCORE: 15,680
-          </div>
-          
-          {/* Featured badge */}
-          <Badge className="absolute top-3 right-3 bg-purple-600 text-white border-purple-400">
+          <div className="w-8 h-12 bg-purple-400 relative animate-pulse" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
+
+          <Badge className="absolute top-3 left-3 bg-indigo-600/20 text-indigo-300 border-indigo-400">
             <Zap className="mr-1 h-3 w-3" />
             SCI-FI
+          </Badge>
+          <Badge className="absolute top-3 right-3 bg-green-600 text-white border-green-400">
+            FREE
           </Badge>
         </div>
         
         <CardHeader className="relative">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold text-purple-400 group-hover:text-purple-300 transition-colors font-mono">
-                VOID VANGUARD ⭐⭐⭐⭐⭐
-              </CardTitle>
-              <CardDescription className="text-gray-400 text-sm">
-                Navigate through space, dodge enemies, and survive the cosmic battlefield!
-              </CardDescription>
-            </div>
+          <CardTitle className="text-2xl font-bold text-indigo-400 group-hover:text-indigo-300 transition-colors font-headline">
+            Void Vanguard
+          </CardTitle>
+          <div className="flex items-center mt-1">
+            {[...Array(4)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />)}
+            <Star className="w-5 h-5 text-gray-600 fill-current" />
           </div>
+          <CardDescription className="text-gray-400 text-sm h-10 mt-2">
+            A classic top-down space shooter. Blast through waves of alien ships and defend the galaxy.
+          </CardDescription>
         </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500">Keyboard Controls</Badge>
+      </div>
+
+      <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge className="bg-indigo-600/20 text-indigo-400 border-indigo-500">Shooter</Badge>
+            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500">Keyboard</Badge>
             <Badge className="bg-cyan-600/20 text-cyan-400 border-cyan-500">Space Combat</Badge>
             <Badge className="bg-red-600/20 text-red-400 border-red-500">High Scores</Badge>
-            <Badge className="bg-blue-600/20 text-blue-400 border-blue-500">Survival Mode</Badge>
           </div>
           
           <div className="grid grid-cols-3 gap-4 text-center text-sm">
             <div>
-              <div className="text-purple-400 font-bold">∞</div>
+              <div className="text-indigo-400 font-bold">∞</div>
               <div className="text-gray-500 text-xs">Waves</div>
             </div>
             <div>
@@ -100,22 +74,23 @@ const VoidVanguardCard = () => {
               <div className="text-gray-500 text-xs">Lives</div>
             </div>
           </div>
-          
-          <Link href="/games/void-vanguard" className="block">
-            <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 group-hover:shadow-lg transition-all font-mono">
+        </div>
+        
+        <div className="mt-auto">
+          <Link href="/games/void-vanguard" className="block mt-4">
+            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 group-hover:shadow-lg transition-all font-headline">
               <Play className="w-5 h-5 mr-2" />
-              ▶ Play Now
+              Play Now
             </Button>
           </Link>
           
-          <div className="text-center">
-            <p className="text-xs text-gray-600">Epic Space Adventure</p>
-            <Button variant="outline" size="sm" className="mt-1 text-xs border-purple-500 text-purple-400 hover:bg-purple-500/10">
+          <div className="text-center mt-2">
+            <Button variant="outline" size="sm" disabled className="mt-1 text-xs border-indigo-500 text-indigo-400 hover:bg-indigo-500/10">
               Defend the Galaxy
             </Button>
           </div>
-        </CardContent>
-      </div>
+        </div>
+      </CardContent>
     </Card>
   );
 };

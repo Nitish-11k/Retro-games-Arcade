@@ -1,42 +1,30 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Pacman, Ghost, map as initialMap, TILE_SIZE, COLS, ROWS } from '@/lib/pac-man-utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { MAP, GHOSTS, PLAYER, TILE_SIZE, POWER_PELLET_TIME } from '@/lib/pix-man-utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RotateCcw, Play } from 'lucide-react';
 
-// It's a good practice to define constants that won't change outside the component
-const PACMAN_START_POS = { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 20 + TILE_SIZE / 2 };
-const GHOST_START_POS = [
-  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 9 + TILE_SIZE / 2, color: 'red', personality: 'blinky' as const },
-  { x: TILE_SIZE * 9 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'pink', personality: 'pinky' as const },
-  { x: TILE_SIZE * 11 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'cyan', personality: 'inky' as const },
-  { x: TILE_SIZE * 10 + TILE_SIZE / 2, y: TILE_SIZE * 10 + TILE_SIZE / 2, color: 'orange', personality: 'clyde' as const },
-];
-
-const PacManGame: React.FC = () => {
+const PixManGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isGameWon, setIsGameWon] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
+  const [powerPelletTimer, setPowerPelletTimer] = useState(0);
+  const pellets = useRef(MAP.flat().filter(tile => tile === 1 || tile === 2).length);
 
-  // gameInstance will now hold only the core mutable game objects
-  const gameInstance = useRef<{
-    pacman: Pacman;
-    ghosts: Ghost[];
-    map: number[][];
-    pelletsCount: number;
-  } | null>(null);
+  const player = useRef({ ...PLAYER });
+  const ghosts = useRef(JSON.parse(JSON.stringify(GHOSTS)));
 
   // Load best score from localStorage on component mount
   useEffect(() => {
-    const savedBestScore = localStorage.getItem('pacman-best-score');
+    const savedBestScore = localStorage.getItem('pixman-best-score');
     if (savedBestScore) {
       setBestScore(parseInt(savedBestScore, 10));
     }
@@ -46,52 +34,35 @@ const PacManGame: React.FC = () => {
   useEffect(() => {
     if (score > bestScore) {
       setBestScore(score);
-      localStorage.setItem('pacman-best-score', score.toString());
+      localStorage.setItem('pixman-best-score', score.toString());
     }
   }, [score, bestScore]);
 
   // This useCallback is now simpler. It just resets state and lets the useEffects handle the rest.
   // The dependency array is empty because it only uses setter functions, which are stable.
-  const startGame = useCallback(() => {
-    const mapCopy = initialMap.map(row => [...row]);
-    gameInstance.current = {
-      pacman: new Pacman(PACMAN_START_POS.x, PACMAN_START_POS.y),
-      ghosts: GHOST_START_POS.map(g => new Ghost(g.x, g.y, g.color, g.personality)),
-      map: mapCopy,
-      pelletsCount: mapCopy.flat().filter(tile => tile === 0 || tile === 3).length,
-    };
+  const startGame = () => {
+    player.current = { ...PLAYER };
+    ghosts.current = JSON.parse(JSON.stringify(GHOSTS));
+    pellets.current = MAP.flat().filter(tile => tile === 1 || tile === 2).length;
     setScore(0);
     setLives(3);
-    setIsGameOver(false);
-    setIsGameWon(false);
+    setGameOver(false);
+    setGameWon(false);
     setIsGameStarted(true);
-  }, []);
+    setPowerPelletTimer(0);
+  };
 
-  // Main Game Loop encapsulated in useEffect.
-  // This effect runs whenever the game's active status changes.
-  useEffect(() => {
-    if (!isGameStarted || isGameOver || isGameWon) {
-      return; // Do not run the loop if the game hasn't started or has ended.
-    }
-
+  const draw = () => {
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
-
-    let animationFrameId: number;
-
-    const gameLoop = () => {
-      // Ensure gameInstance is not null before proceeding
-      if (!gameInstance.current) return;
-      
-      const { pacman, ghosts, map } = gameInstance.current;
 
       // Clear canvas
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
       // Draw map
-      for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
-          const tile = map[row][col];
+    for (let row = 0; row < MAP.length; row++) {
+      for (let col = 0; col < MAP[0].length; col++) {
+        const tile = MAP[row][col];
           if (tile === 1) { // Wall
             ctx.fillStyle = 'blue';
             ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -109,83 +80,137 @@ const PacManGame: React.FC = () => {
         }
       }
 
-      // Update and draw Pac-Man and Ghosts
-      pacman.update();
-      pacman.draw(ctx);
-      const blinky = ghosts.find(g => g.personality === 'blinky');
+    // Update and draw Player and Ghosts
+    player.current.update();
+    player.current.draw(ctx);
+    const blinky = ghosts.current.find(g => g.personality === 'blinky');
 
-      ghosts.forEach(ghost => {
+    ghosts.current.forEach(ghost => {
         if (blinky) {
-          ghost.update(pacman.x, pacman.y, blinky.x, blinky.y);
+        ghost.update(player.current.x, player.current.y, blinky.x, blinky.y);
         } else {
-          ghost.update(pacman.x, pacman.y, pacman.x, pacman.y);
+        ghost.update(player.current.x, player.current.y, player.current.x, player.current.y);
         }
         ghost.draw(ctx);
       });
 
       // Check for pellet eating
-      const gridX = Math.floor(pacman.x / TILE_SIZE);
-      const gridY = Math.floor(pacman.y / TILE_SIZE);
-      if (map[gridY]?.[gridX] === 0) {
-        map[gridY][gridX] = 2; // Mark as eaten
+    const gridX = Math.floor(player.current.x / TILE_SIZE);
+    const gridY = Math.floor(player.current.y / TILE_SIZE);
+    if (MAP[gridY]?.[gridX] === 0) {
+      MAP[gridY][gridX] = 2; // Mark as eaten
         setScore(prev => prev + 10);
-        gameInstance.current.pelletsCount--;
-      } else if (map[gridY]?.[gridX] === 3) {
-        map[gridY][gridX] = 2;
+      pellets.current--;
+    } else if (MAP[gridY]?.[gridX] === 3) {
+      MAP[gridY][gridX] = 2;
         setScore(prev => prev + 50);
-        gameInstance.current.pelletsCount--;
-        ghosts.forEach(ghost => {
+      pellets.current--;
+      ghosts.current.forEach(ghost => {
           ghost.isFrightened = true;
-          ghost.frightenedTimer = 300; // ~5 seconds at 60fps
+        ghost.frightenedTimer = POWER_PELLET_TIME; // ~5 seconds at 60fps
           ghost.speed = 1;
         });
       }
 
       // Check for ghost collisions
-      ghosts.forEach(ghost => {
-        const distance = Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y);
-        if (distance < pacman.radius + ghost.radius) {
+    ghosts.current.forEach(ghost => {
+      const distance = Math.hypot(player.current.x - ghost.x, player.current.y - ghost.y);
+      if (distance < player.current.radius + ghost.radius) {
           if (ghost.isFrightened) {
             setScore(prev => prev + 200);
             ghost.reset(); // Assuming a reset method in the Ghost class
           } else {
             setLives(prev => prev - 1);
-            pacman.reset(); // Assuming a reset method in the Pacman class
+          player.current.reset(); // Assuming a reset method in the Player class
             // Add a brief pause or invincibility if desired
           }
         }
       });
 
       // Check for win condition
-      if (gameInstance.current.pelletsCount === 0) {
-        setIsGameWon(true);
+    if (pellets.current === 0) {
+      setGameWon(true);
+    }
+  };
+
+  const update = () => {
+    if (!isGameStarted || gameOver || gameWon) {
+      return; // Do not run the loop if the game hasn't started or has ended.
+    }
+
+    // Update power pellet timer
+    if (powerPelletTimer > 0) {
+      setPowerPelletTimer(prev => prev - 1);
+      if (powerPelletTimer === 0) {
+        ghosts.current.forEach(ghost => {
+          ghost.isFrightened = false;
+          ghost.frightenedTimer = 0;
+          ghost.speed = 2; // Reset speed
+        });
       }
-      
-      animationFrameId = requestAnimationFrame(gameLoop);
-    };
+    }
 
-    gameLoop();
+    // Update player and ghosts
+    player.current.update();
+    ghosts.current.forEach(ghost => {
+      if (blinky) {
+        ghost.update(player.current.x, player.current.y, blinky.x, blinky.y);
+      } else {
+        ghost.update(player.current.x, player.current.y, player.current.x, player.current.y);
+      }
+    });
 
-    // Cleanup function: This is crucial!
-    // It cancels the animation frame when the component unmounts or the effect re-runs.
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [isGameStarted, isGameOver, isGameWon]); // Dependencies that control the loop's lifecycle
+    // Check for pellet eating (redundant with draw, but kept for clarity)
+    const gridX = Math.floor(player.current.x / TILE_SIZE);
+    const gridY = Math.floor(player.current.y / TILE_SIZE);
+    if (MAP[gridY]?.[gridX] === 0) {
+      MAP[gridY][gridX] = 2; // Mark as eaten
+      setScore(prev => prev + 10);
+      pellets.current--;
+    } else if (MAP[gridY]?.[gridX] === 3) {
+      MAP[gridY][gridX] = 2;
+      setScore(prev => prev + 50);
+      pellets.current--;
+      ghosts.current.forEach(ghost => {
+        ghost.isFrightened = true;
+        ghost.frightenedTimer = POWER_PELLET_TIME; // ~5 seconds at 60fps
+        ghost.speed = 1;
+      });
+    }
 
-  // Effect for handling keyboard input
+    // Check for ghost collisions (redundant with draw, but kept for clarity)
+    ghosts.current.forEach(ghost => {
+      const distance = Math.hypot(player.current.x - ghost.x, player.current.y - ghost.y);
+      if (distance < player.current.radius + ghost.radius) {
+        if (ghost.isFrightened) {
+          setScore(prev => prev + 200);
+          ghost.reset(); // Assuming a reset method in the Ghost class
+        } else {
+          setLives(prev => prev - 1);
+          player.current.reset(); // Assuming a reset method in the Player class
+          // Add a brief pause or invincibility if desired
+        }
+      }
+    });
+
+    // Check for win condition (redundant with draw, but kept for clarity)
+    if (pellets.current === 0) {
+      setGameWon(true);
+    }
+  };
+  
   useEffect(() => {
     if (!isGameStarted) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!gameInstance.current) return;
-      const { pacman } = gameInstance.current;
+      if (!player.current) return;
+      const { x, y, radius } = player.current;
       
       switch (e.key) {
-        case 'ArrowUp': case 'w': pacman.nextDirection = { dx: 0, dy: -1 }; break;
-        case 'ArrowDown': case 's': pacman.nextDirection = { dx: 0, dy: 1 }; break;
-        case 'ArrowLeft': case 'a': pacman.nextDirection = { dx: -1, dy: 0 }; break;
-        case 'ArrowRight': case 'd': pacman.nextDirection = { dx: 1, dy: 0 }; break;
+        case 'ArrowUp': case 'w': player.current.nextDirection = { dx: 0, dy: -1 }; break;
+        case 'ArrowDown': case 's': player.current.nextDirection = { dx: 0, dy: 1 }; break;
+        case 'ArrowLeft': case 'a': player.current.nextDirection = { dx: -1, dy: 0 }; break;
+        case 'ArrowRight': case 'd': player.current.nextDirection = { dx: 1, dy: 0 }; break;
       }
     };
 
@@ -198,23 +223,23 @@ const PacManGame: React.FC = () => {
   // Effect to check for game over condition
   useEffect(() => {
     if (lives === 0) {
-      setIsGameOver(true);
+      setGameOver(true);
     }
   }, [lives]);
   
   // Effect for win sound
   useEffect(() => {
-    if (isGameWon) {
+    if (gameWon) {
       // Consider creating the Audio object once to avoid issues
       const audio = new Audio('/sounds/game-won.mp3');
       audio.play().catch(e => console.error("Error playing sound:", e));
     }
-  }, [isGameWon]);
+  }, [gameWon]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
       <header className="mb-6 text-center">
-        <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">PAC-MAN</h1>
+        <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">Pix-Man</h1>
         <p className="text-sm text-green-400">A RETRO MAZE ADVENTURE</p>
       </header>
       
@@ -226,7 +251,7 @@ const PacManGame: React.FC = () => {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-yellow-300">GAME ARENA</CardTitle>
                 <div className="flex gap-2">
-                  {!isGameStarted || isGameOver || isGameWon ? (
+                  {!isGameStarted || gameOver || gameWon ? (
                     <Button onClick={() => {startGame(); setShowInstructions(true);}} className="bg-yellow-400 text-black hover:bg-yellow-300">
                       <Play className="w-4 h-4 mr-2" /> PLAY
                     </Button>
@@ -239,17 +264,17 @@ const PacManGame: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent className="flex justify-center items-center p-2">
-              <div className="relative w-full" style={{ aspectRatio: `${COLS * TILE_SIZE}/${ROWS * TILE_SIZE}`, minHeight: '500px', maxHeight: '70vh' }}>
+              <div className="relative w-full" style={{ aspectRatio: `${MAP[0].length * TILE_SIZE}/${MAP.length * TILE_SIZE}`, minHeight: '500px', maxHeight: '70vh' }}>
                 <canvas 
                   ref={canvasRef} 
-                  width={COLS * TILE_SIZE} 
-                  height={ROWS * TILE_SIZE} 
+                  width={MAP[0].length * TILE_SIZE} 
+                  height={MAP.length * TILE_SIZE} 
                   className="border-4 border-yellow-300 bg-black w-full h-full"
                   style={{ objectFit: 'contain' }}
                 />
                 {!isGameStarted && (
                   <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
-                    <h3 className="text-2xl mb-4 font-bold text-yellow-300">PAC-MAN</h3>
+                    <h3 className="text-2xl mb-4 font-bold text-yellow-300">Pix-Man</h3>
                     <p className="text-sm mb-2 text-gray-300">USE ARROW KEYS OR WASD</p>
                     <p className="text-xs text-gray-400 mb-4">EAT ALL PELLETS AND AVOID GHOSTS!</p>
                   </div>
@@ -257,7 +282,7 @@ const PacManGame: React.FC = () => {
                 {showInstructions && isGameStarted && (
                   <div className="absolute top-4 left-4 bg-black bg-opacity-80 p-4 rounded-lg text-white text-sm">
                     <p className="font-bold text-yellow-400 mb-2">First time playing?</p>
-                    <p>Use Arrow Keys or WASD to move Pac-Man</p>
+                    <p>Use Arrow Keys or WASD to move Pix-Man</p>
                     <p>Eat all pellets and avoid ghosts!</p>
                     <button 
                       onClick={() => setShowInstructions(false)}
@@ -267,9 +292,9 @@ const PacManGame: React.FC = () => {
                     </button>
                   </div>
                 )}
-                {(isGameOver || isGameWon) && (
+                {(gameOver || gameWon) && (
                   <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
-                    <h3 className="text-2xl mb-2 font-bold text-red-500">{isGameWon ? '🎉 YOU WIN!' : '💀 GAME OVER'}</h3>
+                    <h3 className="text-2xl mb-2 font-bold text-red-500">{gameWon ? '🎉 YOU WIN!' : '💀 GAME OVER'}</h3>
                     <p className="text-lg mb-2 text-gray-200">FINAL SCORE: {score}</p>
                     <p className="text-sm mb-4 text-yellow-400">CLICK RESTART TO PLAY AGAIN</p>
                   </div>
@@ -301,7 +326,7 @@ const PacManGame: React.FC = () => {
               </div>
               <div className="text-center pt-2 border-t border-yellow-300/20">
                 <Badge variant="outline" className="text-yellow-300 border-yellow-300/50">
-                  {isGameStarted ? (isGameOver || isGameWon ? 'GAME ENDED' : 'PLAYING') : 'READY'}
+                  {isGameStarted ? (gameOver || gameWon ? 'GAME ENDED' : 'PLAYING') : 'READY'}
                 </Badge>
               </div>
             </CardContent>
@@ -346,4 +371,4 @@ const PacManGame: React.FC = () => {
   );
 };
 
-export default PacManGame;
+export default PixManGame;

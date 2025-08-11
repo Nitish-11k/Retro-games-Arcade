@@ -1,65 +1,92 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Play, Lock, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Play, Star, Zap } from 'lucide-react';
 
-const PixelPaddleCard: React.FC = () => {
+const PixelPaddleCard = () => {
   return (
-    <Card className="group h-full bg-gradient-to-br from-orange-900 to-red-900 border-2 border-orange-400 hover:border-yellow-300 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,204,0,0.3)] overflow-hidden">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start mb-2">
-          <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-400">
+    <Card className="group flex flex-col h-full hover:scale-105 transition-all duration-300 border-orange-500 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+      <div className="relative">
+        <div className="h-48 bg-black border-b-2 border-orange-500 relative overflow-hidden flex items-center justify-center p-4">
+          <div className="absolute inset-0 opacity-20">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}>
+                <div
+                  className="absolute border-r border-orange-400"
+                  style={{ left: i * 25, height: '100%', width: 1 }}
+                />
+                <div
+                  className="absolute border-b border-orange-400"
+                  style={{ top: i * 16, width: '100%', height: 1 }}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="text-6xl animate-pulse">🧱🏓⚡</div>
+          <Badge className="absolute top-3 left-3 bg-orange-600/20 text-orange-300 border-orange-400">
             <Zap className="w-3 h-3 mr-1" />
             FEATURED
           </Badge>
-          <Badge variant="outline" className="text-green-400 border-green-400/50">
+          <Badge className="absolute top-3 right-3 bg-green-600 text-white border-green-400">
             FREE
           </Badge>
         </div>
-        <CardTitle className="text-xl font-bold text-yellow-300 group-hover:text-yellow-200 transition-colors">
-          Pixel Paddle
-        </CardTitle>
-        <p className="text-sm text-orange-200 leading-relaxed">
-          Break all the bricks in this retro arcade breakout adventure!
-        </p>
-      </CardHeader>
-      
-      <CardContent className="pt-0">
-        <div className="bg-gray-900/50 rounded-lg p-4 mb-4 border border-orange-400/30">
-          <div className="flex items-center justify-center h-32 text-4xl">
-            🧱🏓⚡
+        
+        <CardHeader className="relative">
+          <CardTitle className="text-2xl font-bold text-orange-400 group-hover:text-orange-300 transition-colors font-headline">
+            Pixel Paddle
+          </CardTitle>
+          <div className="flex items-center mt-1">
+            {[...Array(4)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />)}
+            <Star className="w-5 h-5 text-gray-600 fill-current" />
+          </div>
+          <CardDescription className="text-gray-400 text-sm h-10 mt-2">
+            A breakout-style adventure with high-speed paddle action and powerful upgrades.
+          </CardDescription>
+        </CardHeader>
+      </div>
+
+      <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge className="bg-orange-600/20 text-orange-400 border-orange-500">Breakout</Badge>
+            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500">Mouse/Touch</Badge>
+            <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500">High Scores</Badge>
+            <Badge className="bg-red-600/20 text-red-400 border-red-500">Power-ups</Badge>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 text-center text-sm">
+            <div>
+              <div className="text-orange-400 font-bold">50+</div>
+              <div className="text-gray-500 text-xs">Levels</div>
+            </div>
+            <div>
+              <div className="text-yellow-400 font-bold">5</div>
+              <div className="text-gray-500 text-xs">Power-ups</div>
+            </div>
+            <div>
+              <div className="text-green-400 font-bold">∞</div>
+              <div className="text-gray-500 text-xs">Replayability</div>
+            </div>
           </div>
         </div>
         
-        <div className="space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-300">Difficulty:</span>
-            <span className="text-orange-300 font-semibold">Medium</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-300">Type:</span>
-            <span className="text-orange-300 font-semibold">Arcade</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-300">Controls:</span>
-            <span className="text-orange-300 font-semibold">Mouse/Touch</span>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-orange-400/30">
-          <Link href="/games/pixel-paddle">
-            <Button className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold transition-all duration-200 hover:shadow-lg group-hover:animate-pulse">
-              <Play className="w-4 h-4 mr-2" />
-              PLAY NOW
+        <div className="mt-auto">
+          <Link href="/games/pixel-paddle" className="block mt-4">
+            <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 group-hover:shadow-lg transition-all font-headline">
+              <Play className="w-5 h-5 mr-2" />
+              Play Now
             </Button>
           </Link>
-          <p className="text-xs text-gray-400 text-center mt-2">
-            Move paddle • Break bricks • Score points
-          </p>
+          
+          <div className="text-center mt-2">
+            <Button variant="outline" size="sm" disabled className="mt-1 text-xs border-orange-500 text-orange-400 hover:bg-orange-500/10">
+              Break the Blocks
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

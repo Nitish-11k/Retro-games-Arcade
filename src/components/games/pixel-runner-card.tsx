@@ -4,31 +4,28 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Play, Crown, Star } from 'lucide-react';
+import { Play } from 'lucide-react';
 
-const MarioRunnerCard = () => {
+const PixelRunnerCard = () => {
   return (
-    <Card className="group hover:scale-105 transition-all duration-300 border-red-500 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
+    <Card className="group flex flex-col h-full hover:scale-105 transition-all duration-300 border-red-500 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
       <div className="relative">
-        {/* Custom pixel art background */}
-        <div className="h-48 bg-black border-b-2 border-red-500 relative overflow-hidden">
-          {/* Pixel grid background */}
+        <div className="h-48 bg-black border-b-2 border-red-500 relative overflow-hidden flex items-center justify-center p-4">
           <div className="absolute inset-0 opacity-20">
             {Array.from({ length: 12 }).map((_, i) => (
               <div key={i}>
-                <div 
-                  className="absolute border-r border-red-400" 
+                <div
+                  className="absolute border-r border-red-400"
                   style={{ left: i * 25, height: '100%', width: 1 }}
                 />
-                <div 
-                  className="absolute border-b border-red-400" 
+                <div
+                  className="absolute border-b border-red-400"
                   style={{ top: i * 16, width: '100%', height: 1 }}
                 />
               </div>
             ))}
           </div>
           
-          {/* Animated Mario sprite */}
           <div className="absolute top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/2 animate-bounce">
             <div className="grid grid-cols-8 gap-1">
               {/* Mario pixel sprite */}
@@ -110,32 +107,29 @@ const MarioRunnerCard = () => {
           <div className="absolute top-3 left-3 font-mono text-xs text-red-400">
             SCORE: 0000
           </div>
-          
-          {/* Featured badge */}
+
           <Badge className="absolute top-3 right-3 bg-red-600 text-white border-red-400">
             NEW
           </Badge>
         </div>
         
         <CardHeader className="relative">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold text-red-400 group-hover:text-red-300 transition-colors font-mono">
-                MARIO RUNNER ⭐⭐⭐⭐⭐
-              </CardTitle>
-              <CardDescription className="text-gray-400 text-sm">
-                Classic auto-runner with pixel-perfect Mario! Jump, collect coins, and avoid enemies in this endless adventure!
-              </CardDescription>
-            </div>
-          </div>
+          <CardTitle className="text-2xl font-bold text-red-400 group-hover:text-red-300 transition-colors font-headline">
+            Pixel Runner ⭐⭐⭐⭐⭐
+          </CardTitle>
+          <CardDescription className="text-gray-400 text-sm h-10">
+            A fast-paced auto-runner. Jump over obstacles, collect coins, and see how long you can survive!
+          </CardDescription>
         </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
+      </div>
+
+      <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2 mb-4">
             <Badge className="bg-red-600/20 text-red-400 border-red-500">Auto-Runner</Badge>
-            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500">Keyboard Support</Badge>
+            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500">Keyboard</Badge>
             <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500">High Scores</Badge>
-            <Badge className="bg-green-600/20 text-green-400 border-green-500">Efficient DSA</Badge>
+            <Badge className="bg-green-600/20 text-green-400 border-green-500">Physics</Badge>
           </div>
           
           <div className="grid grid-cols-3 gap-4 text-center text-sm">
@@ -152,24 +146,25 @@ const MarioRunnerCard = () => {
               <div className="text-gray-500 text-xs">FPS</div>
             </div>
           </div>
-          
-          <Link href="/games/mario-runner" className="block">
-            <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 group-hover:shadow-lg transition-all font-mono">
+        </div>
+        
+        <div className="mt-auto">
+          <Link href="/games/pixel-runner" className="block mt-4">
+            <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 group-hover:shadow-lg transition-all font-headline">
               <Play className="w-5 h-5 mr-2" />
-              ▶ Play Now
+              Play Now
             </Button>
           </Link>
           
-          <div className="text-center">
-            <p className="text-xs text-gray-600">Optimized Game Engine</p>
-            <Button variant="outline" size="sm" className="mt-1 text-xs border-red-500 text-red-400 hover:bg-red-500/10">
-              Advanced Physics & DSA
+          <div className="text-center mt-2">
+            <Button variant="outline" size="sm" disabled className="mt-1 text-xs border-red-500 text-red-400 hover:bg-red-500/10">
+              Run Like a Runner
             </Button>
           </div>
-        </CardContent>
-      </div>
+        </div>
+      </CardContent>
     </Card>
   );
 };
 
-export default MarioRunnerCard;
+export default PixelRunnerCard;
