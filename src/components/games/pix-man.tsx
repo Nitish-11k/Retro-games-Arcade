@@ -307,17 +307,33 @@ const PixManGame = () => {
       </header>
 
       {/* Game Description */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-yellow-400">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-300 text-center leading-relaxed">
-              Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
-              Chomp your way through every dot to advance to the next level, but watch out - four unique ghosts with different 
-              personalities hunt you down. Grab the flashing power pellets to turn the tables and chase the ghosts for bonus points! 
-              Each ghost has its own strategy: Blinky chases relentlessly, Pinky tries to ambush, Inky flanks unpredictably, 
-              and Clyde plays it cautious. Master the maze, time your moves perfectly, and see how high you can score in this 
-              timeless arcade classic!
-            </p>
+      <div className="max-w-6xl mx-auto mb-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <h2 className="text-lg font-bold text-yellow-300 mb-4">👻 THE MAZE MASTER CHALLENGE</h2>
+                <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                  Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
+                  Chomp your way through every dot to advance to the next level, but watch out for four unique ghost personalities!
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-yellow-600 text-white px-2 py-1 text-xs rounded">CHOMP</span>
+                  <span className="bg-blue-600 text-white px-2 py-1 text-xs rounded">AVOID</span>
+                  <span className="bg-purple-600 text-white px-2 py-1 text-xs rounded">POWER</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-md font-bold text-blue-300 mb-3">👾 GHOST AI PERSONALITIES</h3>
+                <ul className="text-xs text-gray-300 space-y-2">
+                  <li>• <span className="text-red-400">Blinky</span>: Chases relentlessly</li>
+                  <li>• <span className="text-pink-400">Pinky</span>: Tries to ambush ahead</li>
+                  <li>• <span className="text-cyan-400">Inky</span>: Flanks unpredictably</li>
+                  <li>• <span className="text-orange-400">Clyde</span>: Plays it cautious</li>
+                  <li>• Grab power pellets to turn the tables!</li>
+                </ul>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -420,56 +436,56 @@ const PixManGame = () => {
 
       {/* Mobile Controls */}
       {isMobile && (
-        <div className="fixed bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
           <div className="relative pointer-events-auto">
             {/* D-Pad Style Controls */}
-            <div className="relative w-32 h-32">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32">
               {/* Up */}
               <Button
                 onTouchStart={() => handleMobileInput({ dx: 0, dy: -1 })}
                 onMouseDown={() => handleMobileInput({ dx: 0, dy: -1 })}
-                className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-10 h-10 sm:w-12 sm:h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
                 style={{ 
                   boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
                 }}
               >
-                <ArrowUp size={20} />
+                <ArrowUp size={16} />
               </Button>
               
               {/* Down */}
               <Button
                 onTouchStart={() => handleMobileInput({ dx: 0, dy: 1 })}
                 onMouseDown={() => handleMobileInput({ dx: 0, dy: 1 })}
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-10 h-10 sm:w-12 sm:h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
                 style={{ 
                   boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
                 }}
               >
-                <ArrowDown size={20} />
+                <ArrowDown size={16} />
               </Button>
               
               {/* Left */}
               <Button
                 onTouchStart={() => handleMobileInput({ dx: -1, dy: 0 })}
                 onMouseDown={() => handleMobileInput({ dx: -1, dy: 0 })}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-10 h-10 sm:w-12 sm:h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
                 style={{ 
                   boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
                 }}
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} />
               </Button>
               
               {/* Right */}
               <Button
                 onTouchStart={() => handleMobileInput({ dx: 1, dy: 0 })}
                 onMouseDown={() => handleMobileInput({ dx: 1, dy: 0 })}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-12 h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-10 h-10 sm:w-12 sm:h-12 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
                 style={{ 
                   boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
                 }}
               >
-                <ArrowRight size={20} />
+                <ArrowRight size={16} />
               </Button>
             </div>
           </div>

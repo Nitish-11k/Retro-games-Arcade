@@ -65,17 +65,33 @@ const FlappyBirdGame = () => {
       </header>
 
       {/* Game Description */}
-      <div className="w-full max-w-4xl mb-6">
-        <Card className="bg-gray-800 border-2 border-blue-400">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-300 text-center leading-relaxed">
-              Navigate your brave bird through an endless maze of green pipes in this classic arcade-style adventure! 
-              Tap the screen or press spacebar to make your bird flap its wings and soar upward. Master the art of timing 
-              as gravity constantly pulls you down - one wrong move and it's game over! Each pipe you successfully pass 
-              through earns you points, and the challenge intensifies as your speed gradually increases. With simple 
-              one-button controls and addictive gameplay, Flappy Bird tests your reflexes and patience. How high can 
-              you score in this pixelated flight of fury?
-            </p>
+      <div className="w-full max-w-6xl mb-6">
+        <Card className="bg-gray-800 border-2 border-blue-400 shadow-[8px_8px_0px_#1E40AF]">
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <h2 className="text-lg font-bold text-blue-300 mb-4">🐦 THE ULTIMATE FLIGHT CHALLENGE</h2>
+                <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                  Navigate your brave bird through an endless maze of green pipes in this classic arcade-style adventure! 
+                  Master the art of timing as gravity constantly pulls you down - one wrong move and it's game over!
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-blue-600 text-white px-2 py-1 text-xs rounded">TAP</span>
+                  <span className="bg-green-600 text-white px-2 py-1 text-xs rounded">FLY</span>
+                  <span className="bg-yellow-600 text-white px-2 py-1 text-xs rounded">SCORE</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-md font-bold text-yellow-300 mb-3">🎮 GAME MECHANICS</h3>
+                <ul className="text-xs text-gray-300 space-y-2">
+                  <li>• Tap screen or press spacebar to flap wings</li>
+                  <li>• Each pipe passed = +10 points</li>
+                  <li>• Speed gradually increases with distance</li>
+                  <li>• Simple one-button controls</li>
+                  <li>• Test your reflexes and patience</li>
+                </ul>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -173,7 +189,7 @@ const FlappyBirdGame = () => {
 
       {/* Mobile Controls */}
       {isMobile && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
           <Button
             onTouchStart={(e) => {
               e.preventDefault();
@@ -187,13 +203,13 @@ const FlappyBirdGame = () => {
                 gameRef.current.handleInput();
               }
             }}
-            className="select-none bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-300 hover:to-blue-500 active:from-blue-600 active:to-blue-700 text-white font-bold rounded-full w-24 h-24 text-3xl border-4 border-blue-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
+            className="select-none bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-300 hover:to-blue-500 active:from-blue-600 active:to-blue-700 text-white font-bold rounded-full w-20 h-20 sm:w-24 sm:h-24 text-lg sm:text-2xl border-4 border-blue-200 shadow-lg transform active:scale-95 transition-all duration-150 flex items-center justify-center"
             style={{ 
               boxShadow: '0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3)',
               textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
             }}
           >
-            <span className="drop-shadow-sm">TAP</span>
+            <span className="drop-shadow-sm font-bold">TAP</span>
           </Button>
         </div>
       )}
