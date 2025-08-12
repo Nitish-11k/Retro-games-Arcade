@@ -27,13 +27,13 @@ import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/anal
 
 // Your web app's Firebase configuration (prefer env vars; fallback to defaults for dev)
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDNuUsvP3sB8HNgwOtuA_gNbiCohXtFd5I",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyAoLg5riuHFhqWtwGMCB88InEkSrBUOds8",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "retrogamesarcade-541fd.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "retrogamesarcade-541fd",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "retrogamesarcade-541fd.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "504459363139",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:504459363139:web:899bf961f0ae150a1d65f6",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "257515935226",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:257515935226:web:d8c18e55f3c8b519818043",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-L2X7Q0DR59",
 };
 
 // Initialize Firebase
