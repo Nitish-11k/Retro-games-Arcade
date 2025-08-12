@@ -111,6 +111,15 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
 
   async function handleGoogleSignIn() {
     setLoading(true);
+    
+    // Debug: Log current domain information
+    console.log('🔍 Debug Info:');
+    console.log('Current URL:', window.location.href);
+    console.log('Current Origin:', window.location.origin);
+    console.log('Current Hostname:', window.location.hostname);
+    console.log('Current Port:', window.location.port);
+    console.log('Firebase Auth Domain:', auth.app.options.authDomain);
+    
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -118,13 +127,15 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
       onAuthSuccess();
     } catch (error: any) {
       console.error('Google Sign-in Error:', error);
+      console.error('Error Code:', error.code);
+      console.error('Error Message:', error.message);
       
       let errorTitle = 'Google Sign-in Failed';
       let errorDescription = error.message;
       
       if (error.code === 'auth/unauthorized-domain') {
         errorTitle = 'Domain Not Authorized';
-        errorDescription = 'This domain is not authorized for Google Sign-in. Please contact the administrator or use email/password login.';
+        errorDescription = `Domain "${window.location.hostname}" is not authorized. Check the browser console for debug info, then add the exact domain to Firebase Console → Authentication → Settings → Authorized domains.`;
       } else if (error.code === 'auth/popup-closed-by-user') {
         errorTitle = 'Sign-in Cancelled';
         errorDescription = 'Google sign-in was cancelled. Please try again.';

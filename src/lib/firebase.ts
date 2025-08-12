@@ -10,12 +10,19 @@ import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/anal
  * 1. Go to Firebase Console: https://console.firebase.google.com/
  * 2. Select your project: pixel-playground-vayvx
  * 3. Navigate to Authentication > Settings > Authorized domains
- * 4. Add your domains:
- *    - For local development: localhost
+ * 4. Add your domains (check browser console for exact domain):
+ *    - For local development: localhost (or 127.0.0.1)
  *    - For production: retroarcade.in
- *    - For any other domains you're using
+ *    - Firebase default: retrogamesarcade-541fd.firebaseapp.com
+ *    - Firebase hosting: retrogamesarcade-541fd.web.app
+ *    - Any preview URLs: retrogamesarcade-541fd--pr123-abc123.web.app
  * 
- * The domains must match exactly where your app is hosted.
+ * TROUBLESHOOTING:
+ * - Domain must match EXACTLY (no www, http/https, or ports)
+ * - Check browser console for debug info showing current domain
+ * - Try clearing browser cache and cookies
+ * - Firebase changes can take a few minutes to propagate
+ * - For localhost, try both "localhost" and "127.0.0.1"
  */
 
 // Your web app's Firebase configuration (prefer env vars; fallback to defaults for dev)
