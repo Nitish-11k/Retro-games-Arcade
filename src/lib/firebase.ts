@@ -8,7 +8,7 @@ import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/anal
  * IMPORTANT: To fix "auth/unauthorized-domain" errors for Google Sign-in:
  * 
  * 1. Go to Firebase Console: https://console.firebase.google.com/
- * 2. Select your project: pixel-playground-vayvx
+ * 2. Select your project: retrogamesarcade-541fd
  * 3. Navigate to Authentication > Settings > Authorized domains
  * 4. Add your domains (check browser console for exact domain):
  *    - For local development: localhost (or 127.0.0.1)
@@ -28,9 +28,9 @@ import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/anal
 // Your web app's Firebase configuration (prefer env vars; fallback to defaults for dev)
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDNuUsvP3sB8HNgwOtuA_gNbiCohXtFd5I",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "pixel-playground-vayvx.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "pixel-playground-vayvx",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "pixel-playground-vayvx.firebasestorage.app",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "retrogamesarcade-541fd.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "retrogamesarcade-541fd",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "retrogamesarcade-541fd.firebasestorage.app",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "504459363139",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:504459363139:web:899bf961f0ae150a1d65f6",
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
