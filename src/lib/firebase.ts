@@ -4,6 +4,20 @@ import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth"
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
 
+/**
+ * IMPORTANT: To fix "auth/unauthorized-domain" errors for Google Sign-in:
+ * 
+ * 1. Go to Firebase Console: https://console.firebase.google.com/
+ * 2. Select your project: pixel-playground-vayvx
+ * 3. Navigate to Authentication > Settings > Authorized domains
+ * 4. Add your domains:
+ *    - For local development: localhost
+ *    - For production: retroarcade.in
+ *    - For any other domains you're using
+ * 
+ * The domains must match exactly where your app is hosted.
+ */
+
 // Your web app's Firebase configuration (prefer env vars; fallback to defaults for dev)
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDNuUsvP3sB8HNgwOtuA_gNbiCohXtFd5I",

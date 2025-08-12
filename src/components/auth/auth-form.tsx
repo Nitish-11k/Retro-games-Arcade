@@ -68,26 +68,42 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
       }
       onAuthSuccess();
     } catch (error: any) {
-      console.error(error);
+      console.error('Authentication Error:', error);
+      
+      let errorTitle = 'Authentication Failed';
+      let errorDescription = error.message;
+      
       if (error.code === 'auth/email-already-in-use') {
-        toast({
-          title: 'Email Already Registered',
-          description: 'This email is already in use. Please try logging in instead.',
-          variant: 'destructive',
-        });
+        errorTitle = 'Email Already Registered';
+        errorDescription = 'This email is already in use. Please try logging in instead.';
       } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
-        toast({
-          title: 'Invalid credentials',
-          description: 'Email or password is incorrect.',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Authentication Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        errorTitle = 'Invalid Credentials';
+        errorDescription = 'Email or password is incorrect. Please check your credentials and try again.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorTitle = 'Incorrect Password';
+        errorDescription = 'The password you entered is incorrect. Please try again.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorTitle = 'Account Disabled';
+        errorDescription = 'This account has been disabled. Please contact support.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorTitle = 'Too Many Attempts';
+        errorDescription = 'Too many failed attempts. Please wait a moment and try again.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorTitle = 'Network Error';
+        errorDescription = 'Please check your internet connection and try again.';
+      } else if (error.code === 'auth/weak-password') {
+        errorTitle = 'Weak Password';
+        errorDescription = 'Password should be at least 6 characters long.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorTitle = 'Invalid Email';
+        errorDescription = 'Please enter a valid email address.';
       }
+      
+      toast({
+        title: errorTitle,
+        description: errorDescription,
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -101,8 +117,30 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
       toast({ title: 'Welcome!', description: 'Signed in with Google.' });
       onAuthSuccess();
     } catch (error: any) {
-      console.error(error);
-      toast({ title: 'Google Sign-in Failed', description: error.message, variant: 'destructive' });
+      console.error('Google Sign-in Error:', error);
+      
+      let errorTitle = 'Google Sign-in Failed';
+      let errorDescription = error.message;
+      
+      if (error.code === 'auth/unauthorized-domain') {
+        errorTitle = 'Domain Not Authorized';
+        errorDescription = 'This domain is not authorized for Google Sign-in. Please contact the administrator or use email/password login.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorTitle = 'Sign-in Cancelled';
+        errorDescription = 'Google sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        errorTitle = 'Popup Blocked';
+        errorDescription = 'Please allow popups for this site and try again.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorTitle = 'Network Error';
+        errorDescription = 'Please check your internet connection and try again.';
+      }
+      
+      toast({ 
+        title: errorTitle, 
+        description: errorDescription, 
+        variant: 'destructive' 
+      });
     } finally {
       setLoading(false);
     }
@@ -119,8 +157,27 @@ export function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
       await sendPasswordResetEmail(auth, email);
       toast({ title: 'Reset email sent', description: 'Check your inbox for a password reset link.' });
     } catch (error: any) {
-      console.error(error);
-      toast({ title: 'Reset failed', description: error.message, variant: 'destructive' });
+      console.error('Password Reset Error:', error);
+      
+      let errorTitle = 'Reset Failed';
+      let errorDescription = error.message;
+      
+      if (error.code === 'auth/user-not-found') {
+        errorTitle = 'Email Not Found';
+        errorDescription = 'No account found with this email address.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorTitle = 'Invalid Email';
+        errorDescription = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorTitle = 'Too Many Requests';
+        errorDescription = 'Too many reset attempts. Please wait a moment and try again.';
+      }
+      
+      toast({ 
+        title: errorTitle, 
+        description: errorDescription, 
+        variant: 'destructive' 
+      });
     } finally {
       setLoading(false);
     }
