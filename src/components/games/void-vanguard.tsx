@@ -887,17 +887,19 @@ const VoidVanguardGame = () => {
 
 export default function VoidVanguard() {
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: FONT_FAMILY }}>
+        <div className="min-h-screen bg-gray-900 text-gray-200 p-4 font-mono">
             <header className="mb-6 text-center">
-                <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">VOID VANGUARD</h1>
-                <p className="text-sm text-green-400">A RETRO SPACE SHOOTER</p>
+                <h1 className="text-4xl md:text-5xl text-yellow-300 mb-2 tracking-wider font-bold font-mono">VOID VANGUARD</h1>
+                <p className="text-sm text-green-400 font-mono">A RETRO SPACE SHOOTER</p>
             </header>
 
-            {/* Game Description */}
-            <div className="max-w-4xl mx-auto mb-6">
+            <VoidVanguardGame />
+
+            {/* Game Description - Moved below the game */}
+            <div className="w-full mt-6">
                 <Card className="bg-gray-800 border-2 border-yellow-400">
-                    <CardContent className="p-4">
-                        <p className="text-sm text-gray-300 text-center leading-relaxed">
+                    <CardContent className="p-6">
+                        <p className="text-base text-gray-300 text-center leading-relaxed font-mono max-w-none">
                             Defend the galaxy as the ultimate Void Vanguard in this intense retro space shooter! 
                             Pilot your advanced starfighter through waves of alien invaders, each with unique attack patterns 
                             and behaviors. Collect powerful power-ups including rapid fire, spread shots, and protective shields 
@@ -909,10 +911,6 @@ export default function VoidVanguard() {
                     </CardContent>
                 </Card>
             </div>
-
-            <VoidVanguardGame />
-
-            
         </div>
     );
 }

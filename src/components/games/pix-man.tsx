@@ -281,42 +281,17 @@ const PixManGame = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+    <div className="min-h-screen bg-gray-900 text-gray-200 p-4 font-mono">
       <header className="mb-6 text-center">
-        <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">Pix-Man</h1>
-        <p className="text-sm text-green-400">A RETRO MAZE ADVENTURE</p>
+        <h1 className="text-4xl md:text-5xl text-yellow-300 mb-2 tracking-wider font-bold font-mono">Pix-Man</h1>
+        <p className="text-sm text-green-400 font-mono">A RETRO MAZE ADVENTURE</p>
       </header>
 
-      <div className="max-w-6xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              <div>
-                <h2 className="text-lg font-bold text-yellow-300 mb-4">👻 THE MAZE MASTER CHALLENGE</h2>
-                <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                  Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
-                  Chomp your way through every dot to advance to the next level, but watch out for four unique ghost personalities!
-                </p>
-              </div>
-              <div>
-                <h3 className="text-md font-bold text-blue-300 mb-3">👾 GHOST AI PERSONALITIES</h3>
-                <ul className="text-xs text-gray-300 space-y-2">
-                  <li>• <span className="text-red-400">Blinky</span>: Chases relentlessly</li>
-                  <li>• <span className="text-pink-400">Pinky</span>: Tries to ambush ahead</li>
-                  <li>• <span className="text-cyan-400">Inky</span>: Flanks unpredictably</li>
-                  <li>• <span className="text-orange-400">Clyde</span>: Plays it cautious</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
             <CardHeader className="pb-4">
-              <CardTitle className="text-yellow-300">GAME ARENA</CardTitle>
+              <CardTitle className="text-yellow-300 font-mono">GAME ARENA</CardTitle>
             </CardHeader>
             <CardContent className="flex justify-center items-center p-2">
               <div className="relative w-full" style={{ aspectRatio: `${MAP[0].length}/${MAP.length}`, minHeight: '500px', maxHeight: '70vh' }}>
@@ -347,29 +322,29 @@ const PixManGame = () => {
         <aside className="space-y-4">
           <Card className="bg-gray-800 border-2 border-yellow-300 shadow-[4px_4px_0px_#FBC02D]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-yellow-300 text-sm">SCORE BOARD</CardTitle>
+              <CardTitle className="text-yellow-300 text-sm font-mono">SCORE BOARD</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
-                <div className="text-3xl font-bold text-white">{score}</div>
-                <div className="text-xs text-yellow-400/80">SCORE</div>
+                <div className="text-3xl font-bold text-white font-mono">{score}</div>
+                <div className="text-xs text-yellow-400/80 font-mono">SCORE</div>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <div className="text-lg text-red-500">{'♥ '.repeat(Math.max(0, lives))}</div>
-                  <div className="text-xs text-gray-400">LIVES</div>
+                  <div className="text-lg text-red-500 font-mono">{'♥ '.repeat(Math.max(0, lives))}</div>
+                  <div className="text-xs text-gray-400 font-mono">LIVES</div>
                 </div>
                 <div>
-                  <div className="text-lg text-green-400">{bestScore}</div>
-                  <div className="text-xs text-gray-400">BEST</div>
+                  <div className="text-lg text-green-400 font-mono">{bestScore}</div>
+                  <div className="text-xs text-gray-400 font-mono">BEST</div>
                 </div>
                  <div>
-                  <div className="text-lg text-blue-400">{level}</div>
-                  <div className="text-xs text-gray-400">LEVEL</div>
+                  <div className="text-lg text-blue-400 font-mono">{level}</div>
+                  <div className="text-xs text-gray-400 font-mono">LEVEL</div>
                 </div>
               </div>
               <div className="text-center pt-2 border-t border-yellow-300/20">
-                <Badge variant="outline" className="text-yellow-300 border-yellow-300/50">
+                <Badge variant="outline" className="text-yellow-300 border-yellow-300/50 font-mono">
                   {GameState[gameState]}
                 </Badge>
               </div>
@@ -378,16 +353,42 @@ const PixManGame = () => {
 
           <Card className="bg-gray-800 border-2 border-blue-400">
             <CardHeader className="pb-2">
-              <CardTitle className="text-blue-400 text-sm">CONTROLS</CardTitle>
+              <CardTitle className="text-blue-400 text-sm font-mono">CONTROLS</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
-                <div className="text-lg font-bold text-white">ARROW KEYS</div>
-                <div className="text-xs text-blue-400/80">TO MOVE</div>
+                <div className="text-lg font-bold text-white font-mono">ARROW KEYS</div>
+                <div className="text-xs text-blue-400/80 font-mono">TO MOVE</div>
               </div>
             </CardContent>
           </Card>
         </aside>
+      </div>
+
+      {/* Game Description - Moved below the game */}
+      <div className="w-full mt-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <h2 className="text-xl font-bold text-yellow-300 mb-4 font-mono">👻 THE MAZE MASTER CHALLENGE</h2>
+                <p className="text-base text-gray-300 leading-relaxed mb-4 font-mono">
+                  Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
+                  Chomp your way through every dot to advance to the next level, but watch out for four unique ghost personalities!
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-blue-300 mb-3 font-mono">👾 GHOST AI PERSONALITIES</h3>
+                <ul className="text-base text-gray-300 space-y-2 font-mono">
+                  <li>• <span className="text-red-400">Blinky</span>: Chases relentlessly</li>
+                  <li>• <span className="text-pink-400">Pinky</span>: Tries to ambush ahead</li>
+                  <li>• <span className="text-cyan-400">Inky</span>: Flanks unpredictably</li>
+                  <li>• <span className="text-orange-400">Clyde</span>: Plays it cautious</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

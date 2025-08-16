@@ -8,6 +8,9 @@ const Footer = () => {
           <Link href="/about" className="text-purple-400 hover:text-purple-300 transition-colors">
             About Us
           </Link>
+          <Link href="/contact" className="text-blue-400 hover:text-blue-300 transition-colors">
+            Contact Us
+          </Link>
           <Link href="/privacy" className="text-green-400 hover:text-green-300 transition-colors">
             Privacy Policy
           </Link>

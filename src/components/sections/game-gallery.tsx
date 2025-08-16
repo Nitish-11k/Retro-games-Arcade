@@ -5,6 +5,7 @@ import PixelBoxCard from '@/components/games/pixel-box-card';
 import PixManCard from '@/components/games/pix-man-card';
 import VoidVanguardCard from '@/components/games/void-vanguard-card';
 import PixelRunnerCard from '@/components/games/pixel-runner-card';
+import BubbleShooterCard from '@/components/games/bubble-shooter-card';
 
 const GameGallery = () => {
   return (
@@ -18,6 +19,7 @@ const GameGallery = () => {
         <PixManCard />
         <VoidVanguardCard />
         <PixelRunnerCard />
+        <BubbleShooterCard />
       </div>
     </section>
   );
