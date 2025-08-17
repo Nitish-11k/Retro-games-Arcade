@@ -17,7 +17,7 @@ const Header = () => {
     <>
       <a href="/#games" className="hover:text-primary transition-colors font-headline text-lg">All Games</a>
       <a href="/#leaderboard" className="hover:text-primary transition-colors font-headline text-lg">Leaderboard</a>
-      <a href="/#recommender" className="hover:text-primary transition-colors font-headline text-lg">AI Recs</a>
+      <a href="/contact" className="hover:text-primary transition-colors font-headline text-lg">Contact</a>
     </>
   );
 

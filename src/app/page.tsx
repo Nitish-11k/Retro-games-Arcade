@@ -4,7 +4,7 @@ import Footer from '@/components/layout/footer';
 import Hero from '@/components/sections/hero';
 import GameGallery from '@/components/sections/game-gallery';
 import Leaderboards from '@/components/sections/leaderboards';
-import AiRecommender from '@/components/sections/ai-recommender';
+
 
 export const metadata: Metadata = {
   title: 'Play Free Retro Browser Games',
@@ -28,9 +28,7 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
         <Hero />
         <GameGallery />
-        <section id="recommender" className="py-16">
-           <AiRecommender />
-        </section>
+
         <section id="leaderboard" className="py-16">
           <Leaderboards />
         </section>
