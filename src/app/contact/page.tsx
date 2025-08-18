@@ -21,31 +21,31 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-headline text-white mb-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-headline text-white mb-4 sm:mb-6">
             Get in Touch
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
             Have questions, suggestions, or just want to say hello? We'd love to hear from you!
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
           {/* Contact Information */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <Card className="bg-gray-800/50 border-gray-700 text-white">
               <CardHeader>
-                <CardTitle className="text-2xl text-purple-400">Contact Information</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl text-purple-400">Contact Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div className="flex items-center space-x-3">
-                  <Mail className="h-6 w-6 text-blue-400" />
+                  <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                   <div>
-                    <p className="font-semibold">Email</p>
+                    <p className="font-semibold text-sm sm:text-base">Email</p>
                     <a 
                       href="mailto:retroarcade1410@gmail.com" 
-                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                      className="text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base"
                     >
                       retroarcade1410@gmail.com
                     </a>
@@ -53,18 +53,18 @@ export default function ContactPage() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <Clock className="h-6 w-6 text-green-400" />
+                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
                   <div>
-                    <p className="font-semibold">Response Time</p>
-                    <p className="text-gray-300">Within 24 hours</p>
+                    <p className="font-semibold text-sm sm:text-base">Response Time</p>
+                    <p className="text-gray-300 text-sm sm:text-base">Within 24 hours</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
-                  <MapPin className="h-6 w-6 text-red-400" />
+                  <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-red-400" />
                   <div>
-                    <p className="font-semibold">Location</p>
-                    <p className="text-gray-300">Digital Arcade - Available Worldwide</p>
+                    <p className="font-semibold text-sm sm:text-base">Location</p>
+                    <p className="text-gray-300 text-sm sm:text-base">Digital Arcade - Available Worldwide</p>
                   </div>
                 </div>
               </CardContent>
@@ -72,24 +72,24 @@ export default function ContactPage() {
 
             <Card className="bg-gray-800/50 border-gray-700 text-white">
               <CardHeader>
-                <CardTitle className="text-2xl text-purple-400">What We Can Help With</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl text-purple-400">What We Can Help With</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2 sm:space-y-3">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">Game suggestions and feedback</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Game suggestions and feedback</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">Technical support and bug reports</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Technical support and bug reports</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">Partnership opportunities</span>
+                  <span className="text-gray-300 text-sm sm:text-base">Partnership opportunities</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">General inquiries</span>
+                  <span className="text-gray-300 text-sm sm:text-base">General inquiries</span>
                 </div>
               </CardContent>
             </Card>
@@ -98,11 +98,11 @@ export default function ContactPage() {
           {/* Contact Form */}
           <Card className="bg-gray-800/50 border-gray-700 text-white">
             <CardHeader>
-              <CardTitle className="text-2xl text-purple-400">Send us a Message</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl text-purple-400">Send us a Message</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
                       First Name
@@ -110,7 +110,7 @@ export default function ContactPage() {
                     <input
                       type="text"
                       id="firstName"
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Your first name"
                     />
                   </div>
@@ -121,7 +121,7 @@ export default function ContactPage() {
                     <input
                       type="text"
                       id="lastName"
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Your last name"
                     />
                   </div>
@@ -134,7 +134,7 @@ export default function ContactPage() {
                   <input
                     type="email"
                     id="email"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -145,7 +145,7 @@ export default function ContactPage() {
                   </label>
                   <select
                     id="subject"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                   >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
@@ -162,15 +162,15 @@ export default function ContactPage() {
                   </label>
                   <textarea
                     id="message"
-                    rows={5}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    rows={4}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="Tell us what's on your mind..."
                   ></textarea>
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md transition-all duration-200 transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
                 >
                   Send Message
                 </Button>
@@ -180,20 +180,20 @@ export default function ContactPage() {
         </div>
 
         {/* Direct Email Section */}
-        <div className="mt-16 text-center">
+        <div className="mt-12 sm:mt-16 text-center">
           <Card className="bg-gray-800/50 border-gray-700 text-white max-w-2xl mx-auto">
-            <CardContent className="py-8">
-              <h3 className="text-2xl font-headline text-purple-400 mb-4">
+            <CardContent className="py-6 sm:py-8">
+              <h3 className="text-xl sm:text-2xl font-headline text-purple-400 mb-3 sm:mb-4">
                 Prefer to Email Directly?
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
                 You can also reach us directly at our Gmail address
               </p>
               <a
                 href="mailto:retroarcade1410@gmail.com"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-md transition-all duration-200 transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-3 px-6 sm:px-8 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
               >
-                <Mail className="h-5 w-5" />
+                <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>retroarcade1410@gmail.com</span>
               </a>
             </CardContent>

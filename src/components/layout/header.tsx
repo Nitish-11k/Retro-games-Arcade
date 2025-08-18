@@ -8,15 +8,27 @@ import { AuthModal } from '@/components/auth/auth-modal';
 import { UserCircle, LogOut, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
 
 const Header = () => {
   const { user, loading, logout } = useAuth();
   const isMobile = useIsMobile();
+  const { scrollToSection } = useSmoothScroll();
 
   const navLinks = (
     <>
-      <a href="/#games" className="hover:text-primary transition-colors font-headline text-lg">All Games</a>
-      <a href="/#leaderboard" className="hover:text-primary transition-colors font-headline text-lg">Leaderboard</a>
+      <button 
+        onClick={() => scrollToSection('games')} 
+        className="hover:text-primary transition-colors font-headline text-lg cursor-pointer"
+      >
+        All Games
+      </button>
+      <button 
+        onClick={() => scrollToSection('leaderboard')} 
+        className="hover:text-primary transition-colors font-headline text-lg cursor-pointer"
+      >
+        Leaderboard
+      </button>
       <a href="/contact" className="hover:text-primary transition-colors font-headline text-lg">Contact</a>
     </>
   );

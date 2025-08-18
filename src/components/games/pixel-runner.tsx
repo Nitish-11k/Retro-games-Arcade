@@ -35,39 +35,6 @@ const PixelRunnerGame = () => {
         <p className="text-sm text-green-400">A RETRO ENDLESS RUNNER</p>
       </header>
 
-      {/* Game Description */}
-      <div className="max-w-6xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-red-400 shadow-[8px_8px_0px_#DC2626]">
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              <div>
-                <h2 className="text-lg font-bold text-red-300 mb-4">🏃‍♂️ THE ENDLESS ADVENTURE</h2>
-                <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                  Sprint through an endless procedurally-generated world in this high-octane platform adventure! 
-                  Control a pixelated runner who must leap over obstacles, dodge enemies, and collect shiny coins 
-                  while the pace continuously accelerates.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-red-600 text-white px-2 py-1 text-xs rounded">JUMP</span>
-                  <span className="bg-yellow-600 text-white px-2 py-1 text-xs rounded">COLLECT</span>
-                  <span className="bg-green-600 text-white px-2 py-1 text-xs rounded">SURVIVE</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-md font-bold text-yellow-300 mb-3">⚡ GAME FEATURES</h3>
-                <ul className="text-xs text-gray-300 space-y-2">
-                  <li>• Master precise jumping and double-jumping</li>
-                  <li>• Navigate increasingly challenging terrain</li>
-                  <li>• Collect coins to boost your score</li>
-                  <li>• Dynamic world generation - no two runs alike</li>
-                  <li>• Accelerating pace tests your reflexes</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="max-w-6xl mx-auto">
         <Card className="bg-black/50 border-2 border-red-500 shadow-lg shadow-red-500/20">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b-2 border-red-500 gap-4">
@@ -135,6 +102,39 @@ const PixelRunnerGame = () => {
           </Button>
         </div>
       )}
+      
+      {/* Game Description */}
+      <div className="w-full mt-6">
+        <Card className="bg-gray-800 border-2 border-red-400 shadow-[8px_8px_0px_#DC2626]">
+          <CardContent className="p-4 sm:p-6 lg:p-8">
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center">
+              <div>
+                <h2 className="text-base sm:text-lg lg:text-xl font-bold text-red-300 mb-3 sm:mb-4">🏃‍♂️ THE ENDLESS ADVENTURE</h2>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-3 sm:mb-4">
+                  Sprint through an endless procedurally-generated world in this high-octane platform adventure! 
+                  Control a pixelated runner who must leap over obstacles, dodge enemies, and collect shiny coins 
+                  while the pace continuously accelerates.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-red-600 text-white px-2 py-1 text-xs rounded">JUMP</span>
+                  <span className="bg-yellow-600 text-white px-2 py-1 text-xs rounded">COLLECT</span>
+                  <span className="bg-green-600 text-white px-2 py-1 text-xs rounded">SURVIVE</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold text-yellow-300 mb-2 sm:mb-3">⚡ GAME FEATURES</h3>
+                <ul className="text-xs sm:text-sm text-gray-300 space-y-1 sm:space-y-2">
+                  <li>• Master precise jumping and double-jumping</li>
+                  <li>• Navigate increasingly challenging terrain</li>
+                  <li>• Collect coins to boost your score</li>
+                  <li>• Dynamic world generation - no two runs alike</li>
+                  <li>• Accelerating pace tests your reflexes</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

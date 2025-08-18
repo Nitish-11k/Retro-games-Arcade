@@ -47,15 +47,15 @@ export default function AiRecommender() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-4">
-          <Bot className="w-10 h-10 text-primary" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+          <Bot className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
           <div>
-            <CardTitle className="text-3xl font-headline">AI Game Recommender</CardTitle>
-            <CardDescription>Don't know what to play? Let our AI suggest your next favorite game!</CardDescription>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-headline">AI Game Recommender</CardTitle>
+            <CardDescription className="text-sm sm:text-base">Don't know what to play? Let our AI suggest your next favorite game!</CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         <div className="space-y-2">
           <label htmlFor="game-history" className="font-body text-sm">
             Describe games or genres you enjoy...
@@ -67,37 +67,38 @@ export default function AiRecommender() {
             onChange={(e) => setHistory(e.target.value)}
             rows={3}
             disabled={loading}
+            className="text-sm sm:text-base"
           />
         </div>
-        <Button onClick={handleRecommendation} disabled={loading}>
+        <Button onClick={handleRecommendation} disabled={loading} className="w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
           {loading ? 'Thinking...' : 'Get Recommendations'}
         </Button>
 
         {loading && (
-          <div className="space-y-4 pt-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
+          <div className="space-y-3 sm:space-y-4 pt-4">
+            <Skeleton className="h-20 sm:h-24 w-full" />
+            <Skeleton className="h-20 sm:h-24 w-full" />
+            <Skeleton className="h-20 sm:h-24 w-full" />
           </div>
         )}
 
         {recommendations && (
-          <div className="pt-4 space-y-4">
-            <h3 className="text-xl font-headline flex items-center gap-2">
-              <ThumbsUp className="w-6 h-6 text-primary" />
+          <div className="pt-4 space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-headline flex items-center gap-2">
+              <ThumbsUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               Here are your top picks:
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {recommendations.recommendations.map((rec) => (
                 <Card key={rec.gameTitle} className="bg-background/50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
-                      <Gamepad2 /> {rec.gameTitle}
+                  <CardHeader className="p-3 sm:p-4">
+                    <CardTitle className="flex items-center gap-2 text-primary text-sm sm:text-base">
+                      <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" /> {rec.gameTitle}
                     </CardTitle>
                     <CardDescription className="font-body text-xs pt-1">{rec.gameGenre}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-foreground/80">{rec.shortDescription}</p>
+                  <CardContent className="p-3 sm:p-4 pt-0">
+                    <p className="text-xs sm:text-sm text-foreground/80">{rec.shortDescription}</p>
                   </CardContent>
                 </Card>
               ))}

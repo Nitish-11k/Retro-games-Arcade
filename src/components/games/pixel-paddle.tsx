@@ -583,23 +583,6 @@ const PixelPaddle: React.FC = () => {
         <p className="text-sm text-green-400">A RETRO BREAKOUT ADVENTURE</p>
       </header>
 
-      {/* Game Description */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-yellow-400">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-300 text-center leading-relaxed">
-              Bounce your way to victory in this classic brick-breaking extravaganza! Control your paddle to keep the 
-              ball in play while systematically destroying colorful brick formations. Each brick type requires different 
-              hits to break, and stronger bricks yield higher points. Watch for special power-ups that drop from golden 
-              bricks - grab them to unlock wider paddles, slower balls, and other game-changing abilities! The physics 
-              are precise: hit the ball with different parts of your paddle to control its angle and strategy. Complete 
-              levels to face increasingly complex brick patterns and faster gameplay. Can you master the perfect angles 
-              and clear every last brick?
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <Card className="bg-gray-800 border-2 border-green-400 shadow-[8px_8px_0px_#2E7D32]">
@@ -792,9 +775,9 @@ const PixelPaddle: React.FC = () => {
       
       
 
-      {/* Mobile Controls */}
+      {/* Mobile Controls - Hidden on Desktop */}
       {isMobile && gameState === 'PLAYING' && (
-        <div className="fixed bottom-8 left-0 right-0 flex justify-between px-8 z-50 pointer-events-none">
+        <div className="fixed bottom-8 left-0 right-0 flex justify-between px-8 z-50 pointer-events-none md:hidden">
           <div className="pointer-events-auto">
             <Button
               onTouchStart={() => setMobileMove('left')}
@@ -827,6 +810,23 @@ const PixelPaddle: React.FC = () => {
           </div>
         </div>
       )}
+      
+      {/* Game Description */}
+      <div className="w-full mt-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400">
+          <CardContent className="p-4 sm:p-6 lg:p-8">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-300 text-center leading-relaxed max-w-none">
+              Bounce your way to victory in this classic brick-breaking extravaganza! Control your paddle to keep the 
+              ball in play while systematically destroying colorful brick formations. Each brick type requires different 
+              hits to break, and stronger bricks yield higher points. Watch for special power-ups that drop from golden 
+              bricks - grab them to unlock wider paddles, slower balls, and other game-changing abilities! The physics 
+              are precise: hit the ball with different parts of your paddle to control its angle and strategy. Complete 
+              levels to face increasingly complex brick patterns and faster gameplay. Can you master the perfect angles 
+              and clear every last brick?
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

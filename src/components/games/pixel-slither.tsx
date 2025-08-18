@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Play,
   Pause,
@@ -24,6 +25,10 @@ import {
   Flame,
   Award,
   Medal,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 import { createAchievements, loadGameData, saveGameData, type Achievement } from '@/lib/pixel-slither-utils';
 
@@ -105,6 +110,7 @@ const PixelSlither: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState(2);
   const [wallBehavior, setWallBehavior] = useState<WallBehavior>('wrap');
   const [isClient, setIsClient] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setIsClient(true);
@@ -237,11 +243,26 @@ const PixelSlither: React.FC = () => {
     const handleKeyPress = (e: KeyboardEvent) => {
       let newDirection: Position | null = null;
       switch (e.key.toLowerCase()) {
-        case 'arrowup': case 'w': newDirection = { x: 0, y: -1 }; break;
-        case 'arrowdown': case 's': newDirection = { x: 0, y: 1 }; break;
-        case 'arrowleft': case 'a': newDirection = { x: -1, y: 0 }; break;
-        case 'arrowright': case 'd': newDirection = { x: 1, y: 0 }; break;
-        case ' ': case 'p': e.preventDefault(); togglePause(); return;
+        case 'arrowup': case 'w': 
+          e.preventDefault(); 
+          newDirection = { x: 0, y: -1 }; 
+          break;
+        case 'arrowdown': case 's': 
+          e.preventDefault(); 
+          newDirection = { x: 0, y: 1 }; 
+          break;
+        case 'arrowleft': case 'a': 
+          e.preventDefault(); 
+          newDirection = { x: -1, y: 0 }; 
+          break;
+        case 'arrowright': case 'd': 
+          e.preventDefault(); 
+          newDirection = { x: 1, y: 0 }; 
+          break;
+        case ' ': case 'p': 
+          e.preventDefault(); 
+          togglePause(); 
+          return;
       }
       if (newDirection) {
         setGameState(prev => {
@@ -299,6 +320,15 @@ const PixelSlither: React.FC = () => {
   const resetGame = () => setGameState(getInitialState());
   const continueGame = () => setGameState(prev => ({ ...prev, gameRunning: true, isPaused: false }));
 
+  const handleDirectionChange = (newDirection: Position) => {
+    setGameState(prev => {
+      if (prev.gameRunning && (prev.direction.x + newDirection.x !== 0 || prev.direction.y + newDirection.y !== 0)) {
+        return { ...prev, direction: newDirection };
+      }
+      return prev;
+    });
+  };
+
   const renderGame = () => {
     const cellSize = 20;
     const canvasSize = GRID_SIZE * cellSize;
@@ -335,20 +365,21 @@ const PixelSlither: React.FC = () => {
           <div className={`absolute flex items-center justify-center text-lg ${gameState.food.color}`} style={{ left: gameState.food.x * cellSize, top: gameState.food.y * cellSize, width: cellSize, height: cellSize, borderRadius: '50%', boxShadow: 'inset 2px -2px 2px rgba(0,0,0,0.3)' }}>
            {gameState.food.char}
           </div>
-          {!gameState.gameStarted && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
+          {/* Game State Overlays - Only one shown at a time */}
+          {!gameState.gameStarted && !gameState.gameOver && !gameState.isPaused && (
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center z-20">
               <h3 className="text-xl mb-4 font-bold text-yellow-300">PIXEL SLITHER</h3>
               <p className="text-sm mb-2 text-gray-300">USE WASD OR ARROW KEYS</p>
               <p className="text-xs text-gray-400">SWIPE ON MOBILE</p>
             </div>
           )}
-          {gameState.isPaused && !gameState.gameOver && (
-             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center">
+          {gameState.isPaused && !gameState.gameOver && gameState.gameStarted && (
+             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20">
               <h3 className="text-2xl font-bold text-yellow-300">PAUSED</h3>
             </div>
           )}
           {gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-4 text-center">
+            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-4 text-center z-20">
               <h3 className="text-2xl mb-2 font-bold text-red-500">GAME OVER</h3>
               <p className="text-lg mb-2 text-gray-200">SCORE: {gameState.score}</p>
               <p className="text-sm mb-4 text-yellow-400">
@@ -376,151 +407,212 @@ const PixelSlither: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-      <header className="mb-6 text-center">
-        <h1 className="text-3xl md:text-4xl text-yellow-300 mb-2">PIXEL SLITHER</h1>
-        <p className="text-sm text-green-400">A RETRO SNAKE ADVENTURE</p>
-      </header>
-
-      {/* Game Description */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-yellow-400">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-300 text-center leading-relaxed">
-              Guide your serpentine friend through a digital garden feast in this timeless arcade classic! 
-              Start as a tiny snake and grow longer with every delicious fruit you consume. Navigate the grid-based 
-              world using arrow keys or swipe gestures, but beware - one wrong move into your own tail or the walls 
-              spells instant doom! Choose your difficulty level to control the pace, from leisurely crawling to 
-              lightning-fast slithering. Master the art of strategic movement as your snake becomes increasingly 
-              unwieldy. With multiple wall behaviors and speed settings, every game offers a fresh challenge. 
-              How long can you grow before running out of space?
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <Card className="bg-gray-800 border-2 border-green-400 shadow-[8px_8px_0px_#2E7D32]">
-            <CardHeader className="pb-4">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-yellow-300">GAME ARENA</CardTitle>
-                <div className="flex gap-2">
-                  {!gameState.gameStarted || gameState.gameOver ? (
-                    <Button onClick={startGame} className="bg-yellow-400 text-black hover:bg-yellow-300" disabled={!levels.find(l => l.id === selectedLevel)?.unlocked}>
-                      <Play className="w-4 h-4 mr-2" />START
-                    </Button>
-                  ) : (
-                    <>
-                      <Button onClick={togglePause} className="bg-orange-500 text-white hover:bg-orange-600" disabled={gameState.gameOver}>
-                        {gameState.isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+    <div className="min-h-screen bg-gray-900 text-green-400 p-2 sm:p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="lg:col-span-3">
+            <Card className="bg-gray-800 border-2 border-green-400 shadow-[8px_8px_0px_#2E7D32]">
+              <CardHeader className="pb-3 sm:pb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+                  <CardTitle className="text-yellow-300 text-sm sm:text-base">GAME ARENA</CardTitle>
+                  <div className="flex gap-2">
+                    {!gameState.gameStarted || gameState.gameOver ? (
+                      <Button onClick={startGame} className="bg-yellow-400 text-black hover:bg-yellow-300 text-xs sm:text-sm px-3 sm:px-4 py-2" disabled={!levels.find(l => l.id === selectedLevel)?.unlocked}>
+                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />START
                       </Button>
-                      <Button onClick={resetGame} className="bg-red-600 text-white hover:bg-red-700">
-                        <RotateCcw className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="flex justify-center items-center p-2">
-              {renderGame()}
-            </CardContent>
-          </Card>
-
-          {(!gameState.gameStarted || gameState.gameOver) && (
-            <Card className="mt-6 bg-gray-800 border-2 border-green-400">
-              <CardHeader><CardTitle className="text-yellow-300">SETTINGS</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm text-gray-300 mb-2 block">DIFFICULTY</Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {levels.map((level) => (
-                        <Button
-                          key={level.id}
-                          onClick={() => setSelectedLevel(level.id)}
-                          disabled={!level.unlocked}
-                          className={`h-auto p-3 flex flex-col items-center justify-center text-center transition-all duration-200 ${selectedLevel === level.id ? 'bg-yellow-400 text-black ring-2 ring-offset-2 ring-offset-gray-800 ring-yellow-400' : level.unlocked ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}
-                        >
-                          <span className="text-xs">{level.name}</span>
-                          {level.pro && <Badge variant="destructive" className="mt-1 bg-red-500 text-white text-[10px]">PRO</Badge>}
+                    ) : (
+                      <>
+                        <Button onClick={togglePause} className="bg-orange-500 text-white hover:bg-orange-600 text-xs sm:text-sm px-3 sm:px-4 py-2" disabled={gameState.gameOver}>
+                          {gameState.isPaused ? <Play className="w-3 h-3 sm:w-4 sm:h-4" /> : <Pause className="w-3 h-3 sm:w-4 sm:h-4" />}
                         </Button>
-                      ))}
+                        <Button onClick={resetGame} className="bg-red-600 text-white hover:bg-red-700 text-xs sm:text-sm px-3 sm:px-4 py-2">
+                          <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="flex justify-center items-center p-2">
+                {renderGame()}
+              </CardContent>
+            </Card>
+
+            {(!gameState.gameStarted || gameState.gameOver) && (
+              <Card className="mt-4 sm:mt-6 bg-gray-800 border-2 border-green-400">
+                <CardHeader><CardTitle className="text-yellow-300 text-sm sm:text-base">SETTINGS</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm text-gray-300 mb-2 block">DIFFICULTY</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+                        {levels.map((level) => (
+                          <Button
+                            key={level.id}
+                            onClick={() => setSelectedLevel(level.id)}
+                            disabled={!level.unlocked}
+                            className={`h-auto p-2 sm:p-3 flex flex-col items-center justify-center text-center transition-all duration-200 text-xs sm:text-sm ${selectedLevel === level.id ? 'bg-yellow-400 text-black ring-2 ring-offset-2 ring-offset-gray-800 ring-yellow-400' : level.unlocked ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}
+                          >
+                            <span className="text-xs">{level.name}</span>
+                            {level.pro && <Badge variant="destructive" className="mt-1 bg-red-500 text-white text-[10px]">PRO</Badge>}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator className="bg-green-400/20" />
+                    <div>
+                      <Label className="text-sm text-gray-300 mb-2 block">WALLS</Label>
+                      <div className="flex items-center space-x-4 p-3 bg-gray-900/50 rounded-md">
+                        <Label htmlFor="wall-behavior" className={`text-sm ${wallBehavior === 'solid' ? 'text-yellow-300' : 'text-gray-400'}`}>Solid</Label>
+                        <Switch
+                          id="wall-behavior"
+                          checked={wallBehavior === 'wrap'}
+                          onCheckedChange={(checked) => setWallBehavior(checked ? 'wrap' : 'solid')}
+                          className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600"
+                        />
+                        <Label htmlFor="wall-behavior" className={`text-sm ${wallBehavior === 'wrap' ? 'text-yellow-300' : 'text-gray-400'}`}>Wrap Around</Label>
+                      </div>
                     </div>
                   </div>
-                  <Separator className="bg-green-400/20" />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Mobile Controls - Hidden on Desktop */}
+            {isMobile && gameState.gameStarted && !gameState.gameOver && (
+              <Card className="mt-4 sm:mt-6 bg-gray-800 border-2 border-blue-400 md:hidden">
+                <CardHeader>
+                  <CardTitle className="text-blue-300 text-sm">MOBILE CONTROLS</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="col-start-2">
+                      <Button 
+                        onClick={() => handleDirectionChange({ x: 0, y: -1 })}
+                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
+                        disabled={gameState.isPaused}
+                      >
+                        <ArrowUp className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    <div className="col-start-1 row-start-2">
+                      <Button 
+                        onClick={() => handleDirectionChange({ x: -1, y: 0 })}
+                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
+                        disabled={gameState.isPaused}
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    <div className="col-start-2 row-start-2">
+                      <Button 
+                        onClick={() => handleDirectionChange({ x: 0, y: 1 })}
+                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
+                        disabled={gameState.isPaused}
+                      >
+                        <ArrowDown className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    <div className="col-start-3 row-start-2">
+                      <Button 
+                        onClick={() => handleDirectionChange({ x: 1, y: 0 })}
+                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
+                        disabled={gameState.isPaused}
+                      >
+                        <ArrowRight className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <aside className="space-y-3 sm:space-y-4">
+            <Card className="bg-gray-800 border-2 border-yellow-300 shadow-[4px_4px_0px_#FBC02D]">
+              <CardHeader className="pb-2"><CardTitle className="text-yellow-300 text-xs sm:text-sm">SCORE BOARD</CardTitle></CardHeader>
+              <CardContent className="space-y-2 sm:space-y-3">
+                <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">{gameState.score}</div>
+                  <div className="text-xs text-yellow-400/80">SCORE</div>
+                </div>
+                <Separator className="bg-yellow-300/20" />
+                <div className="grid grid-cols-2 gap-2 text-center">
                   <div>
-                    <Label className="text-sm text-gray-300 mb-2 block">WALLS</Label>
-                    <div className="flex items-center space-x-4 p-3 bg-gray-900/50 rounded-md">
-                      <Label htmlFor="wall-behavior" className={`text-sm ${wallBehavior === 'solid' ? 'text-yellow-300' : 'text-gray-400'}`}>Solid</Label>
-                      <Switch
-                        id="wall-behavior"
-                        checked={wallBehavior === 'wrap'}
-                        onCheckedChange={(checked) => setWallBehavior(checked ? 'wrap' : 'solid')}
-                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600"
-                      />
-                      <Label htmlFor="wall-behavior" className={`text-sm ${wallBehavior === 'wrap' ? 'text-yellow-300' : 'text-gray-400'}`}>Wrap Around</Label>
-                    </div>
+                    <div className="text-sm sm:text-lg text-red-500">{'♥ '.repeat(gameState.lives)}</div>
+                    <div className="text-xs text-gray-400">LIVES</div>
                   </div>
+                  <div>
+                    <div className="text-sm sm:text-lg text-green-400">{gameData.highScore}</div>
+                    <div className="text-xs text-gray-400">BEST</div>
+                  </div>
+                </div>
+                <div className="text-center pt-2 border-t border-yellow-300/20">
+                  <Badge variant="outline" className="text-yellow-300 border-yellow-300/50 text-xs">LEVEL {gameState.level}</Badge>
                 </div>
               </CardContent>
             </Card>
-          )}
-        </div>
+            
+            {!gameState.gameRunning && gameState.lives > 0 && gameState.gameStarted && !gameState.gameOver && (
+              <Button onClick={continueGame} className="w-full bg-yellow-400 text-black hover:bg-yellow-300 animate-pulse text-xs sm:text-sm py-2">
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                CONTINUE ({gameState.lives} lives)
+              </Button>
+            )}
 
-        <aside className="space-y-4">
-          <Card className="bg-gray-800 border-2 border-yellow-300 shadow-[4px_4px_0px_#FBC02D]">
-            <CardHeader className="pb-2"><CardTitle className="text-yellow-300 text-sm">SCORE BOARD</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
-                <div className="text-3xl font-bold text-white">{gameState.score}</div>
-                <div className="text-xs text-yellow-400/80">SCORE</div>
-              </div>
-              <Separator className="bg-yellow-300/20" />
-              <div className="grid grid-cols-2 gap-2 text-center">
+            <Card className="bg-gray-800 border-2 border-green-400">
+               <CardHeader className="pb-2"><CardTitle className="text-green-400 text-xs sm:text-sm">RECORDS</CardTitle></CardHeader>
+               <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                   <Dialog><DialogTrigger asChild>
+                      <Button className="w-full bg-green-600 text-white hover:bg-green-500 text-xs sm:text-sm py-2"><Trophy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />LEADERBOARD</Button>
+                    </DialogTrigger><DialogContent className="bg-gray-900 border-green-400 text-gray-200"><DialogHeader><DialogTitle className="text-green-400">LEADERBOARD</DialogTitle></DialogHeader>
+                    <Tabs defaultValue="global" className="w-full"><TabsList className="grid w-full grid-cols-2 bg-gray-800 border-green-400/50"><TabsTrigger value="global">GLOBAL</TabsTrigger><TabsTrigger value="friends" disabled>FRIENDS</TabsTrigger></TabsList>
+                    <TabsContent value="global"><ScrollArea className="h-72 pr-3">{gameData.leaderboard.length > 0 ? gameData.leaderboard.map((entry: LeaderboardEntry, i: number) => (<div key={i} className="flex items-center justify-between p-2 my-1 bg-green-500/10 border-l-2 border-green-500"><div className="flex items-center gap-3"><Badge variant="secondary" className="bg-green-500/50">#{i+1}</Badge><span>{entry.name}</span></div><span className="font-bold">{entry.score}</span></div>)) : <p className="text-center py-8">NO SCORES YET!</p>}</ScrollArea></TabsContent></Tabs></DialogContent>
+                   </Dialog>
+                   <Dialog><DialogTrigger asChild>
+                      <Button className="w-full bg-yellow-600 text-white hover:bg-yellow-500 text-xs sm:text-sm py-2"><Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />ACHIEVEMENTS</Button>
+                    </DialogTrigger><DialogContent className="bg-gray-900 border-yellow-400 text-gray-200"><DialogHeader><DialogTitle className="text-yellow-400">ACHIEVEMENTS</DialogTitle></DialogHeader>
+                    <ScrollArea className="h-80 pr-3"><div className="space-y-3">{achievements.map((a) => { const Icon = iconMap[a.iconName as IconName]; return (<div key={a.id} className={`p-3 border ${a.unlocked ? 'bg-yellow-400/10 border-yellow-400' : 'bg-gray-800 border-gray-700 opacity-60'}`}><div className="flex items-center gap-3 mb-2"><div className={`p-2 ${a.unlocked ? 'bg-yellow-400' : 'bg-gray-700'}`}><Icon className={`w-4 h-4 ${a.unlocked ? 'text-black' : 'text-gray-200'}`} /></div><div className="flex-1"><h4 className="font-bold text-sm">{a.name}</h4><p className="text-xs text-gray-400">{a.description}</p></div>{a.unlocked && (<Badge className="bg-yellow-400 text-black">✓</Badge>)}</div><Progress value={(a.current/a.requirement)*100} className="h-1 [&>div]:bg-yellow-400" /><p className="text-xs text-gray-500 mt-1 text-right">{a.current} / {a.requirement}</p></div>);})}</div></ScrollArea></DialogContent>
+                   </Dialog>
+               </CardContent>
+            </Card>
+          </aside>
+        </div>
+        
+        {/* Game Description */}
+        <div className="w-full mt-6">
+          <Card className="bg-gray-800 border-2 border-green-400 shadow-[8px_8px_0px_#2E7D32]">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
                 <div>
-                  <div className="text-lg text-red-500">{'♥ '.repeat(gameState.lives)}</div>
-                  <div className="text-xs text-gray-400">LIVES</div>
+                  <h2 className="text-sm sm:text-base lg:text-lg font-bold text-green-300 mb-3 sm:mb-4">🐍 THE ULTIMATE SNAKE CHALLENGE</h2>
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 sm:mb-4">
+                    Navigate your pixel snake through a maze of delicious treats! Grow longer with each bite, 
+                    but watch out - hitting yourself or the walls means game over. Master the art of strategic 
+                    movement and see how long you can survive!
+                  </p>
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
+                    <span className="bg-green-600 text-white px-2 py-1 text-xs rounded">GROW</span>
+                    <span className="bg-yellow-600 text-white px-2 py-1 text-xs rounded">SCORE</span>
+                    <span className="bg-red-600 text-white px-2 py-1 text-xs rounded">SURVIVE</span>
+                  </div>
                 </div>
                 <div>
-                  <div className="text-lg text-green-400">{gameData.highScore}</div>
-                  <div className="text-xs text-gray-400">BEST</div>
+                  <h3 className="text-sm sm:text-base font-bold text-yellow-300 mb-2 sm:mb-3">🎮 GAME MECHANICS</h3>
+                  <ul className="text-xs text-gray-300 space-y-1 sm:space-y-2">
+                    <li>• Use arrow keys or touch controls to move</li>
+                    <li>• Eat food to grow and increase score</li>
+                    <li>• Avoid hitting yourself or walls</li>
+                    <li>• Multiple difficulty levels available</li>
+                    <li>• Unlock achievements as you play</li>
+                  </ul>
                 </div>
-              </div>
-              <div className="text-center pt-2 border-t border-yellow-300/20">
-                <Badge variant="outline" className="text-yellow-300 border-yellow-300/50">LEVEL {gameState.level}</Badge>
               </div>
             </CardContent>
           </Card>
-          
-          {!gameState.gameRunning && gameState.lives > 0 && gameState.gameStarted && !gameState.gameOver && (
-            <Button onClick={continueGame} className="w-full bg-yellow-400 text-black hover:bg-yellow-300 animate-pulse">
-              <Zap className="w-4 h-4 mr-2" />
-              CONTINUE ({gameState.lives} lives)
-            </Button>
-          )}
-
-          <Card className="bg-gray-800 border-2 border-green-400">
-             <CardHeader className="pb-2"><CardTitle className="text-green-400 text-sm">RECORDS</CardTitle></CardHeader>
-             <CardContent className="grid grid-cols-2 gap-2">
-                 <Dialog><DialogTrigger asChild>
-                    <Button className="w-full bg-green-600 text-white hover:bg-green-500"><Trophy className="w-4 h-4 mr-2" />LEADERBOARD</Button>
-                  </DialogTrigger><DialogContent className="bg-gray-900 border-green-400 text-gray-200"><DialogHeader><DialogTitle className="text-green-400">LEADERBOARD</DialogTitle></DialogHeader>
-                  <Tabs defaultValue="global" className="w-full"><TabsList className="grid w-full grid-cols-2 bg-gray-800 border-green-400/50"><TabsTrigger value="global">GLOBAL</TabsTrigger><TabsTrigger value="friends" disabled>FRIENDS</TabsTrigger></TabsList>
-                  <TabsContent value="global"><ScrollArea className="h-72 pr-3">{gameData.leaderboard.length > 0 ? gameData.leaderboard.map((entry: LeaderboardEntry, i: number) => (<div key={i} className="flex items-center justify-between p-2 my-1 bg-green-500/10 border-l-2 border-green-500"><div className="flex items-center gap-3"><Badge variant="secondary" className="bg-green-500/50">#{i+1}</Badge><span>{entry.name}</span></div><span className="font-bold">{entry.score}</span></div>)) : <p className="text-center py-8">NO SCORES YET!</p>}</ScrollArea></TabsContent></Tabs></DialogContent>
-                 </Dialog>
-                 <Dialog><DialogTrigger asChild>
-                    <Button className="w-full bg-yellow-600 text-white hover:bg-yellow-500"><Star className="w-4 h-4 mr-2" />ACHIEVEMENTS</Button>
-                  </DialogTrigger><DialogContent className="bg-gray-900 border-yellow-400 text-gray-200"><DialogHeader><DialogTitle className="text-yellow-400">ACHIEVEMENTS</DialogTitle></DialogHeader>
-                  <ScrollArea className="h-80 pr-3"><div className="space-y-3">{achievements.map((a) => { const Icon = iconMap[a.iconName as IconName]; return (<div key={a.id} className={`p-3 border ${a.unlocked ? 'bg-yellow-400/10 border-yellow-400' : 'bg-gray-800 border-gray-700 opacity-60'}`}><div className="flex items-center gap-3 mb-2"><div className={`p-2 ${a.unlocked ? 'bg-yellow-400' : 'bg-gray-700'}`}><Icon className={`w-4 h-4 ${a.unlocked ? 'text-black' : 'text-gray-200'}`} /></div><div className="flex-1"><h4 className="font-bold text-sm">{a.name}</h4><p className="text-xs text-gray-400">{a.description}</p></div>{a.unlocked && (<Badge className="bg-yellow-400 text-black">✓</Badge>)}</div><Progress value={(a.current/a.requirement)*100} className="h-1 [&>div]:bg-yellow-400" /><p className="text-xs text-gray-500 mt-1 text-right">{a.current} / {a.requirement}</p></div>);})}</div></ScrollArea></DialogContent>
-                 </Dialog>
-             </CardContent>
-          </Card>
-        </aside>
+        </div>
+        
       </div>
-      
-      
     </div>
   );
 };

@@ -893,11 +893,13 @@ export default function VoidVanguard() {
                 <p className="text-sm text-green-400">A RETRO SPACE SHOOTER</p>
             </header>
 
+            <VoidVanguardGame />
+
             {/* Game Description */}
-            <div className="max-w-4xl mx-auto mb-6">
+            <div className="w-full mt-6">
                 <Card className="bg-gray-800 border-2 border-yellow-400">
-                    <CardContent className="p-4">
-                        <p className="text-sm text-gray-300 text-center leading-relaxed">
+                    <CardContent className="p-4 sm:p-6 lg:p-8">
+                        <p className="text-sm sm:text-base lg:text-lg text-gray-300 text-center leading-relaxed max-w-none">
                             Defend the galaxy as the ultimate Void Vanguard in this intense retro space shooter! 
                             Pilot your advanced starfighter through waves of alien invaders, each with unique attack patterns 
                             and behaviors. Collect powerful power-ups including rapid fire, spread shots, and protective shields 
@@ -909,10 +911,6 @@ export default function VoidVanguard() {
                     </CardContent>
                 </Card>
             </div>
-
-            <VoidVanguardGame />
-
-            
         </div>
     );
 }

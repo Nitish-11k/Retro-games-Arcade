@@ -287,31 +287,6 @@ const PixManGame = () => {
         <p className="text-sm text-green-400">A RETRO MAZE ADVENTURE</p>
       </header>
 
-      <div className="max-w-6xl mx-auto mb-6">
-        <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              <div>
-                <h2 className="text-lg font-bold text-yellow-300 mb-4">👻 THE MAZE MASTER CHALLENGE</h2>
-                <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                  Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
-                  Chomp your way through every dot to advance to the next level, but watch out for four unique ghost personalities!
-                </p>
-              </div>
-              <div>
-                <h3 className="text-md font-bold text-blue-300 mb-3">👾 GHOST AI PERSONALITIES</h3>
-                <ul className="text-xs text-gray-300 space-y-2">
-                  <li>• <span className="text-red-400">Blinky</span>: Chases relentlessly</li>
-                  <li>• <span className="text-pink-400">Pinky</span>: Tries to ambush ahead</li>
-                  <li>• <span className="text-cyan-400">Inky</span>: Flanks unpredictably</li>
-                  <li>• <span className="text-orange-400">Clyde</span>: Plays it cautious</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
@@ -388,6 +363,32 @@ const PixManGame = () => {
             </CardContent>
           </Card>
         </aside>
+      </div>
+      
+      {/* Game Description */}
+      <div className="w-full mt-6">
+        <Card className="bg-gray-800 border-2 border-yellow-400 shadow-[8px_8px_0px_#FBC02D]">
+          <CardContent className="p-4 sm:p-6 lg:p-8">
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center">
+              <div>
+                <h2 className="text-base sm:text-lg lg:text-xl font-bold text-yellow-300 mb-3 sm:mb-4">👻 THE MAZE MASTER CHALLENGE</h2>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-3 sm:mb-4">
+                  Enter the classic maze and guide Pix-Man through corridors filled with pellets while avoiding colorful ghosts! 
+                  Chomp your way through every dot to advance to the next level, but watch out for four unique ghost personalities!
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold text-blue-300 mb-2 sm:mb-3">👾 GHOST AI PERSONALITIES</h3>
+                <ul className="text-xs sm:text-sm text-gray-300 space-y-1 sm:space-y-2">
+                  <li>• <span className="text-red-400">Blinky</span>: Chases relentlessly</li>
+                  <li>• <span className="text-pink-400">Pinky</span>: Tries to ambush ahead</li>
+                  <li>• <span className="text-cyan-400">Inky</span>: Flanks unpredictably</li>
+                  <li>• <span className="text-orange-400">Clyde</span>: Plays it cautious</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

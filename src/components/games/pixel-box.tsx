@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { 
   ROWS, 
   COLS, 
@@ -38,6 +39,7 @@ export default function PixelBoxGame() {
   const [gameStarted, setGameStarted] = useState(false)
   const [highScore, setHighScoreState] = useState(0)
   const [showGhost, setShowGhost] = useState(true)
+  const isMobile = useIsMobile()
 
   const gameLoopRef = useRef<NodeJS.Timeout>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -297,38 +299,22 @@ export default function PixelBoxGame() {
   const displayGrid = createDisplayGrid()
 
   return (
-    <div className="min-h-screen bg-black text-green-400 p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+    <div className="min-h-screen bg-black text-green-400 p-2 sm:p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
       <div className="max-w-7xl mx-auto">
-        {/* Game Description */}
-        <div className="mb-6">
-          <Card className="bg-gray-900 border-green-400 border-2">
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-300 text-center leading-relaxed">
-                Stack, rotate, and clear your way to victory in this electrifying block-dropping puzzle! 
-                Seven unique tetromino shapes fall from above, and it's your job to fit them perfectly into 
-                horizontal lines. Rotate pieces with precision, slide them left and right, and use the hard drop 
-                for lightning-fast placement. Complete lines disappear and boost your score, but let the blocks 
-                reach the top and it's game over! As your level increases, pieces fall faster, testing your 
-                reflexes and spatial reasoning. The ghost piece shows you exactly where your block will land. 
-                Master the art of perfect placement and see how high you can score!
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
           <div className="lg:col-span-3 flex justify-center">
-            <Card className="bg-gray-900 border-green-400 border-2">
+            <Card className="bg-gray-900 border-green-400 border-2 w-full">
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-green-400 text-2xl">PIXEL BOX</CardTitle>
+                <CardTitle className="text-green-400 text-lg sm:text-xl lg:text-2xl">PIXEL BOX</CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-3 sm:p-6">
                 <div className="relative flex justify-center">
                   <div 
-                    className="inline-block border-4 border-green-400 bg-black p-3"
+                    className="inline-block border-4 border-green-400 bg-black p-2 sm:p-3"
                     style={{ 
                       boxShadow: '0 0 30px #4ade80',
-                      filter: 'drop-shadow(0 0 15px #4ade80)'
+                      filter: 'drop-shadow(0 0 15px #4ade80)',
+                      maxWidth: isMobile ? '100%' : 'auto'
                     }}
                   >
                     {displayGrid.map((row, rowIndex) => (
@@ -338,8 +324,8 @@ export default function PixelBoxGame() {
                             key={colIndex}
                             className="border border-gray-700"
                             style={{
-                              width: 32,
-                              height: 32,
+                              width: isMobile ? 24 : 32,
+                              height: isMobile ? 24 : 32,
                               backgroundColor: getCellColor(cell, rowIndex, colIndex),
                               boxShadow: cell === 1 ? 'inset 0 0 5px rgba(255,255,255,0.3)' : 'none'
                             }}
@@ -354,20 +340,20 @@ export default function PixelBoxGame() {
                       <div className="text-center">
                         {gameOver && (
                           <>
-                            <div className="text-red-400 text-xl mb-2">GAME OVER</div>
-                            <div className="text-green-400 text-sm mb-4">PRESS SPACE TO RESTART</div>
+                            <div className="text-red-400 text-lg sm:text-xl mb-2">GAME OVER</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS SPACE TO RESTART</div>
                           </>
                         )}
                         {isPaused && !gameOver && (
                           <>
-                            <div className="text-yellow-400 text-xl mb-2">PAUSED</div>
-                            <div className="text-green-400 text-sm mb-4">PRESS P TO CONTINUE</div>
+                            <div className="text-yellow-400 text-lg sm:text-xl mb-2">PAUSED</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS P TO CONTINUE</div>
                           </>
                         )}
                         {!gameStarted && !gameOver && (
                           <>
-                            <div className="text-green-400 text-xl mb-2">PIXEL BOX</div>
-                            <div className="text-green-400 text-sm mb-4">PRESS SPACE TO START</div>
+                            <div className="text-green-400 text-lg sm:text-xl mb-2">PIXEL BOX</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS SPACE TO START</div>
                           </>
                         )}
                       </div>
@@ -375,44 +361,81 @@ export default function PixelBoxGame() {
                   )}
                 </div>
 
-                <div className="mt-6 grid grid-cols-4 gap-3">
-                  <Button 
-                    onClick={() => movePiece('left')}
-                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
-                    disabled={gameOver || !gameStarted}
-                  >
-                    ← LEFT
-                  </Button>
-                  <Button 
-                    onClick={() => movePiece('right')}
-                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
-                    disabled={gameOver || !gameStarted}
-                  >
-                    RIGHT →
-                  </Button>
-                  <Button 
-                    onClick={() => rotatePiece()}
-                    className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm py-3"
-                    disabled={gameOver || !gameStarted}
-                  >
-                    ↻ ROTATE
-                  </Button>
-                  <Button 
-                    onClick={() => hardDrop()}
-                    className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm py-3"
-                    disabled={gameOver || !gameStarted}
-                  >
-                    ↓ DROP
-                  </Button>
-                </div>
+                {/* Mobile Controls */}
+                {isMobile && (
+                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3">
+                    <Button 
+                      onClick={() => movePiece('left')}
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ← LEFT
+                    </Button>
+                    <Button 
+                      onClick={() => movePiece('right')}
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      RIGHT →
+                    </Button>
+                    <Button 
+                      onClick={() => rotatePiece()}
+                      className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-xs sm:text-sm py-2 sm:py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ↻ ROTATE
+                    </Button>
+                    <Button 
+                      onClick={() => hardDrop()}
+                      className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-xs sm:text-sm py-2 sm:py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ↓ DROP
+                    </Button>
+                  </div>
+                )}
+
+                {/* Desktop Controls */}
+                {!isMobile && (
+                  <div className="mt-6 grid grid-cols-4 gap-3">
+                    <Button 
+                      onClick={() => movePiece('left')}
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ← LEFT
+                    </Button>
+                    <Button 
+                      onClick={() => movePiece('right')}
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      RIGHT →
+                    </Button>
+                    <Button 
+                      onClick={() => rotatePiece()}
+                      className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ↻ ROTATE
+                    </Button>
+                    <Button 
+                      onClick={() => hardDrop()}
+                      className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm py-3"
+                      disabled={gameOver || !gameStarted}
+                    >
+                      ↓ DROP
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
-          <aside className="lg:col-span-1 space-y-4">
+          <aside className="lg:col-span-1 space-y-3 sm:space-y-4">
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-sm">SCORE</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm">SCORE</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-xs">
@@ -436,7 +459,7 @@ export default function PixelBoxGame() {
 
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-sm">NEXT</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm">NEXT</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">
@@ -448,8 +471,8 @@ export default function PixelBoxGame() {
                             key={x}
                             className="border border-gray-700"
                             style={{
-                              width: 20,
-                              height: 20,
+                              width: isMobile ? 16 : 20,
+                              height: isMobile ? 16 : 20,
                               backgroundColor: cell ? nextPiece.color : 'transparent'
                             }}
                           />
@@ -463,7 +486,7 @@ export default function PixelBoxGame() {
 
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-sm">CONTROLS</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm">CONTROLS</CardTitle>
               </CardHeader>
               <CardContent className="space-y-1 text-xs">
                 <div>A/D or ←/→: MOVE</div>
@@ -476,16 +499,16 @@ export default function PixelBoxGame() {
             </Card>
 
             <Card className="bg-gray-900 border-green-400 border-2">
-              <CardContent className="p-4 space-y-2">
+              <CardContent className="p-3 sm:p-4 space-y-2">
                 <Button 
                   onClick={resetGame}
-                  className="w-full bg-red-700 hover:bg-red-600 text-red-100 border border-red-400"
+                  className="w-full bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-xs sm:text-sm py-2"
                 >
                   NEW GAME
                 </Button>
                 <Button 
                   onClick={() => setIsPaused(!isPaused)}
-                  className="w-full bg-yellow-700 hover:bg-yellow-600 text-yellow-100 border border-yellow-400"
+                  className="w-full bg-yellow-700 hover:bg-yellow-600 text-yellow-100 border border-yellow-400 text-xs sm:text-sm py-2"
                   disabled={gameOver || !gameStarted}
                 >
                   {isPaused ? 'RESUME' : 'PAUSE'}
@@ -502,6 +525,23 @@ export default function PixelBoxGame() {
               </CardContent>
             </Card>
           </aside>
+        </div>
+        
+        {/* Game Description */}
+        <div className="w-full mt-6">
+          <Card className="bg-gray-900 border-green-400 border-2">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <p className="text-xs sm:text-sm text-gray-300 text-center leading-relaxed max-w-none">
+                Stack, rotate, and clear your way to victory in this electrifying block-dropping puzzle! 
+                Seven unique tetromino shapes fall from above, and it's your job to fit them perfectly into 
+                horizontal lines. Rotate pieces with precision, slide them left and right, and use the hard drop 
+                for lightning-fast placement. Complete lines disappear and boost your score, but let the blocks 
+                reach the top and it's game over! As your level increases, pieces fall faster, testing your 
+                reflexes and spatial reasoning. The ghost piece shows you exactly where your block will land. 
+                Master the art of perfect placement and see how high you can score!
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

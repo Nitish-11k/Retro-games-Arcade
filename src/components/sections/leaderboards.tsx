@@ -12,31 +12,31 @@ const allScores: Score[] = [
 
 const Leaderboards = () => {
   return (
-    <div>
-      <h2 className="text-3xl md:text-4xl font-headline text-center mb-12">High Scores</h2>
+    <div id="leaderboard" className="px-4 sm:px-6 lg:px-8">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline text-center mb-8 sm:mb-10 lg:mb-12">High Scores</h2>
       <Tabs defaultValue="overall" className="w-full font-headline">
         <TabsList className="grid w-full grid-cols-2 md:w-1/2 mx-auto font-headline">
-          <TabsTrigger value="overall" className="font-headline">Overall</TabsTrigger>
-          <TabsTrigger value="games" disabled className="font-headline">By Game (Soon!)</TabsTrigger>
+          <TabsTrigger value="overall" className="font-headline text-xs sm:text-sm">Overall</TabsTrigger>
+          <TabsTrigger value="games" disabled className="font-headline text-xs sm:text-sm">By Game (Soon!)</TabsTrigger>
         </TabsList>
         <TabsContent value="overall">
-            <div className="border rounded-lg mt-4 font-headline">
+            <div className="border rounded-lg mt-4 font-headline overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="font-headline">
-                    <TableHead className="w-[50px] font-headline">Rank</TableHead>
-                    <TableHead className="font-headline">Player</TableHead>
-                    <TableHead className="font-headline">Game</TableHead>
-                    <TableHead className="text-right font-headline">Score</TableHead>
+                    <TableHead className="w-[40px] sm:w-[50px] font-headline text-xs sm:text-sm">Rank</TableHead>
+                    <TableHead className="font-headline text-xs sm:text-sm">Player</TableHead>
+                    <TableHead className="font-headline text-xs sm:text-sm">Game</TableHead>
+                    <TableHead className="text-right font-headline text-xs sm:text-sm">Score</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {allScores.map((score) => (
                     <TableRow key={score.id} className="font-headline">
-                      <TableCell className="font-medium font-headline">{score.rank}</TableCell>
-                      <TableCell className="font-headline">{score.player}</TableCell>
-                      <TableCell className="font-headline">{score.gameTitle}</TableCell>
-                      <TableCell className="text-right font-headline">{score.points.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium font-headline text-xs sm:text-sm">{score.rank}</TableCell>
+                      <TableCell className="font-headline text-xs sm:text-sm">{score.player}</TableCell>
+                      <TableCell className="font-headline text-xs sm:text-sm">{score.gameTitle}</TableCell>
+                      <TableCell className="text-right font-headline text-xs sm:text-sm">{score.points.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

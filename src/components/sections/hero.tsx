@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+
 
 const Hero = () => {
   return (
@@ -12,11 +14,11 @@ const Hero = () => {
         Your portal to custom-coded, retro-inspired arcade classics.
       </p>
       <div className="mt-8">
-        <a href="#games">
+        <Link href="/games">
           <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
             Enter The Arcade
           </Button>
-        </a>
+        </Link>
       </div>
     </section>
   );
