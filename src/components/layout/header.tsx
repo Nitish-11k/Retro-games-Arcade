@@ -23,8 +23,15 @@ const Header = () => {
       // If we're on homepage, scroll to section
       scrollToSection(section);
     } else {
-      // If we're on other pages, navigate to homepage and then scroll
-      router.push(`/#${section}`);
+      // If we're on other pages, navigate to homepage first
+      router.push('/');
+      // Use a simple timeout that's reliable
+      setTimeout(() => {
+        // Check if we're on homepage before scrolling
+        if (window.location.pathname === '/') {
+          scrollToSection(section);
+        }
+      }, 300);
     }
   };
 
