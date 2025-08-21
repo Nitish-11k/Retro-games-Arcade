@@ -9,27 +9,55 @@ import { UserCircle, LogOut, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
+import { useRouter, usePathname } from 'next/navigation';
 
 const Header = () => {
   const { user, loading, logout } = useAuth();
   const isMobile = useIsMobile();
   const { scrollToSection } = useSmoothScroll();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleNavigation = (section: string) => {
+    if (pathname === '/') {
+      // If we're on homepage, scroll to section
+      scrollToSection(section);
+    } else {
+      // If we're on other pages, navigate to homepage and then scroll
+      router.push(`/#${section}`);
+    }
+  };
+
+  const isHomePage = pathname === '/';
 
   const navLinks = (
     <>
       <button 
-        onClick={() => scrollToSection('games')} 
-        className="hover:text-primary transition-colors font-headline text-lg cursor-pointer"
+        onClick={() => handleNavigation('games')} 
+        className={`hover:text-primary transition-colors font-headline text-lg cursor-pointer ${
+          isHomePage ? 'text-primary' : 'text-gray-300 hover:text-primary'
+        }`}
+        title={isHomePage ? "Scroll to games section" : "Go to homepage games section"}
       >
         All Games
       </button>
       <button 
-        onClick={() => scrollToSection('leaderboard')} 
-        className="hover:text-primary transition-colors font-headline text-lg cursor-pointer"
+        onClick={() => handleNavigation('leaderboard')} 
+        className={`hover:text-primary transition-colors font-headline text-lg cursor-pointer ${
+          isHomePage ? 'text-primary' : 'text-gray-300 hover:text-primary'
+        }`}
+        title={isHomePage ? "Scroll to leaderboard section" : "Go to homepage leaderboard section"}
       >
         Leaderboard
       </button>
-      <a href="/contact" className="hover:text-primary transition-colors font-headline text-lg">Contact</a>
+      <Link 
+        href="/contact" 
+        className={`hover:text-primary transition-colors font-headline text-lg ${
+          pathname === '/contact' ? 'text-primary' : 'text-gray-300 hover:text-primary'
+        }`}
+      >
+        Contact
+      </Link>
     </>
   );
 

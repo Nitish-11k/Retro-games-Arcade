@@ -4,8 +4,8 @@ import FlappyBirdCard from '@/components/games/flappy-bird-card';
 import PixelBoxCard from '@/components/games/pixel-box-card';
 import PixManCard from '@/components/games/pix-man-card';
 import VoidVanguardCard from '@/components/games/void-vanguard-card';
-// import PixelVelocityCard from '@/components/games/pixel-velocity-card';
-// import PixelRunnerCard from '@/components/games/pixel-runner-card';
+import PixelVelocityCard from '@/components/games/pixel-velocity-card';
+import PixelRunnerCard from '@/components/games/pixel-runner-card';
 
 const GameGallery = () => {
   return (
@@ -18,8 +18,8 @@ const GameGallery = () => {
         <PixelBoxCard />
         <PixManCard />
         <VoidVanguardCard />
-        {/* <PixelVelocityCard /> */}
-        {/* <PixelRunnerCard /> */}
+        <PixelVelocityCard />
+        <PixelRunnerCard />
       </div>
     </section>
   );
