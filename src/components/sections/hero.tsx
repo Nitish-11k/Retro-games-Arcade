@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-
+import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
 
 const Hero = () => {
+  const { scrollToSection } = useSmoothScroll();
+
+  const handleEnterArcade = () => {
+    scrollToSection('games');
+  };
+
   return (
     <section id="home" className="text-center py-20 md:py-32">
       <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-headline tracking-tighter leading-tight">
@@ -14,11 +20,14 @@ const Hero = () => {
         Your portal to custom-coded, retro-inspired arcade classics.
       </p>
       <div className="mt-8">
-        <Link href="/games">
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-            Enter The Arcade
-          </Button>
-        </Link>
+        <Button 
+          size="lg" 
+          variant="secondary" 
+          className="text-lg px-8 py-6"
+          onClick={handleEnterArcade}
+        >
+          Enter The Arcade
+        </Button>
       </div>
     </section>
   );
