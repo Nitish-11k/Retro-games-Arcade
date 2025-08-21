@@ -242,49 +242,45 @@ const createInitialState = (): GameState => ({
     powerUpTimer: 0,
     bossSpawned: false,
     enemyQueue: [],
-    enemySpawnTimer: 0,
+    enemySpawnTimer: ENEMY_SPAWN_RATE, // Initialize with spawn rate so enemies spawn immediately
 });
 
 const spawnWave = (level: number): Enemy[] => {
     const enemies: Enemy[] = [];
-    
-    // Difficulty scaling based on level
-    const maxEnemiesPerWave = 3 + Math.min(level, 7); // 3-10 enemies per wave
-    const enemyHealth = 1 + Math.floor(level / 3); // Health increases every 3 levels
-    
-    // Spawn enemies in smaller groups from the top
-    for (let i = 0; i < maxEnemiesPerWave; i++) {
-        // Random horizontal position across the screen width
-        const x = Math.random() * (GAME_WIDTH - 80) + 40; // Keep enemies within screen bounds
-        
-        // Staggered vertical positions so they don't all appear at once
-        const y = -50 - (i * 30); // Start above screen, staggered
-        
-        // Randomize enemy properties based on level
-        const isStronger = Math.random() < (level / 10); // Higher levels have more strong enemies
-        const bonusHealth = isStronger ? Math.floor(level / 4) : 0;
-        
-        enemies.push({
-            id: Date.now() + i,
-            x: x,
-            y: y,
-            width: 40,
-            height: 30,
-            type: 'standard',
-            hp: enemyHealth + bonusHealth,
-            direction: 1,
-            bossState: undefined,
-            attackTimer: 0
-        });
+    const rows = 2 + Math.min(level, 5);
+    const cols = 8;
+    const enemyWidth = 50;
+    const enemyHeight = 30;
+    const horizontalGap = (GAME_WIDTH - cols * enemyWidth) / (cols + 1);
+
+    const wave: Enemy[] = [];
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            wave.push({
+                id: Date.now() + (row * cols + col),
+                x: horizontalGap * (col + 1) + col * enemyWidth,
+                y: -50 - (row * 60), // Start above screen, staggered
+                width: enemyWidth,
+                height: enemyHeight,
+                type: 'standard',
+                hp: 1 + Math.floor(level / 2),
+                lastShot: 0,
+            });
+        }
     }
-    
-    return enemies;
+    // Return sorted so they spawn from the top row first
+    return wave.sort((a, b) => b.y - a.y);
 };
 
 const gameReducer = (state: GameState, action: Action): GameState => {
     switch (action.type) {
         case 'START_GAME':
-return { ...createInitialState(), status: 'PLAYING', enemyQueue: spawnWave(1) };
+            return { 
+                ...createInitialState(), 
+                status: 'PLAYING', 
+                enemyQueue: spawnWave(1),
+                enemySpawnTimer: 0 // Spawn enemies immediately
+            };
         case 'NEXT_LEVEL': {
             const nextLevel = state.level + 1;
             return {
@@ -294,6 +290,7 @@ return { ...createInitialState(), status: 'PLAYING', enemyQueue: spawnWave(1) };
                 score: state.score,
                 lives: state.lives,
                 enemyQueue: spawnWave(nextLevel),
+                enemySpawnTimer: 0, // Spawn enemies immediately
             };
         }
         case 'RESET_GAME':
@@ -309,6 +306,7 @@ return { ...createInitialState(), status: 'PLAYING', enemyQueue: spawnWave(1) };
             // --- Replenish Enemy Queue ---
             if (nextState.enemyQueue.length === 0 && !nextState.bossSpawned) {
                 nextState.enemyQueue = spawnWave(nextState.level);
+                nextState.enemySpawnTimer = 0; // Spawn immediately
             }
 
             // --- Enemy Spawning ---
@@ -376,50 +374,77 @@ return { ...createInitialState(), status: 'PLAYING', enemyQueue: spawnWave(1) };
 nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { ...b, y: b.y + b.vy * dt, x: b.x + b.vx * dt, active: b.y < GAME_HEIGHT && b.y > -BULLET_HEIGHT && b.x > -BULLET_WIDTH && b.x < GAME_WIDTH } : b);
             nextState.powerUps = nextState.powerUps.map(p => ({ ...p, y: p.y + POWER_UP_SPEED * dt }));
             
-            // --- Enemy Movement & AI ---
-            nextState.enemies.forEach(enemy => {
-                if (enemy.type === 'boss') {
-                    // Boss movement logic
-                    if (enemy.bossState === 'ENTERING') {
-                        enemy.y += 50 * dt;
-                        if (enemy.y >= 50) {
-                            enemy.bossState = 'PHASE_1';
-                            enemy.y = 50;
-                        }
-                    } else if (enemy.bossState === 'PHASE_1' || enemy.bossState === 'PHASE_2') {
-                        // Ensure direction is defined
-                        if (enemy.direction === undefined) enemy.direction = 1;
-                        
-                        enemy.x += enemy.direction * 100 * dt;
-                        if (enemy.x <= 50 || enemy.x >= GAME_WIDTH - 150) {
-                            enemy.direction *= -1;
-                        }
+            // --- Enemy Movement & Boss Logic ---
+            const enemyBullets = [...nextState.enemyBullets];
+            nextState.enemies = nextState.enemies.map(enemy => {
+                 if (enemy.type === 'boss') {
+                    let newBoss = { ...enemy };
+                    // Boss State Machine
+                    switch(newBoss.bossState) {
+                        case 'ENTERING':
+                            newBoss.y += ENEMY_SPEED * dt * 0.5;
+                            if (newBoss.y >= 50) {
+                                newBoss.y = 50;
+                                newBoss.bossState = 'PHASE_1';
+                                newBoss.attackTimer = 2; // Start firing after 2s
+                            }
+                            break;
+                        case 'PHASE_1':
+                        case 'PHASE_2':
+                            // Movement
+                            let newX = newBoss.x + ENEMY_SPEED * dt * (newBoss.direction || 1) * (newBoss.bossState === 'PHASE_2' ? 1.5 : 1);
+                            if (newX <= 0 || newX + newBoss.width >= GAME_WIDTH) {
+                                newBoss.direction = -(newBoss.direction || 1);
+                            }
+                            newBoss.x = newX;
+                            
+                            // Attacking
+                            newBoss.attackTimer! -= dt;
+                            if (newBoss.attackTimer! <= 0) {
+                                const fire = (vx: number, vy: number) => {
+                                    const bulletIndex = enemyBullets.findIndex(b => !b.active);
+                                    if(bulletIndex !== -1) {
+                                        enemyBullets[bulletIndex] = { ...enemyBullets[bulletIndex], active: true, x: newBoss.x + newBoss.width / 2, y: newBoss.y + newBoss.height, vx, vy };
+                                    }
+                                }
+                                if (newBoss.bossState === 'PHASE_1') {
+                                    fire(0, ENEMY_BULLET_SPEED);
+                                    newBoss.attackTimer = 1.5;
+                                } else { // PHASE_2
+                                    fire(0, ENEMY_BULLET_SPEED * 1.2);
+                                    fire(-100, ENEMY_BULLET_SPEED * 0.9);
+                                    fire(100, ENEMY_BULLET_SPEED * 0.9);
+                                    newBoss.attackTimer = 1;
+                                }
+                            }
+                            // Check for phase transition
+                            if (newBoss.hp < 50 && newBoss.bossState === 'PHASE_1') {
+                                newBoss.bossState = 'PHASE_2';
+                            }
+                            break;
                     }
-                } else {
-                    // Regular enemy movement - move down with some horizontal variation
-                    const baseSpeed = ENEMY_SPEED + (nextState.level * 3); // Speed increases with level
-                    
-                    // Ensure direction is defined
-                    if (enemy.direction === undefined) enemy.direction = 1;
-                    
-                    // Add some horizontal movement for variety
-                    if (Math.random() < 0.01) { // 1% chance to change direction each frame
-                        enemy.direction = Math.random() < 0.5 ? 1 : -1;
-                    }
-                    
-                    // Move down (primary movement)
-                    enemy.y += baseSpeed * dt;
-                    
-                    // Move horizontally (secondary movement)
-                    enemy.x += enemy.direction * (baseSpeed * 0.3) * dt;
-                    
-                    // Bounce off screen edges
-                    if (enemy.x <= 0 || enemy.x >= GAME_WIDTH - enemy.width) {
-                        enemy.direction *= -1;
-                        enemy.x = Math.max(0, Math.min(enemy.x, GAME_WIDTH - enemy.width));
+                     return newBoss;
+                }
+
+                // Standard enemy logic
+                const newY = enemy.y + ENEMY_SPEED * dt;
+                let updatedEnemy = { ...enemy, y: newY, lastShot: enemy.lastShot || now };
+
+                // Standard enemy firing logic
+                if (now - updatedEnemy.lastShot > ENEMY_FIRE_RATE * 1000 && updatedEnemy.y > 0) {
+                    const bulletIndex = enemyBullets.findIndex(b => !b.active);
+                    if (bulletIndex !== -1 && updatedEnemy.y > 0) {
+                        const enemyCenter = updatedEnemy.x + updatedEnemy.width / 2;
+                        const vx = 0; // Bullets travel straight down
+                        const vy = ENEMY_BULLET_SPEED; // Downward speed
+                        enemyBullets[bulletIndex] = { ...enemyBullets[bulletIndex], active: true, x: enemyCenter, y: updatedEnemy.y + updatedEnemy.height, vx, vy };
+                        updatedEnemy.lastShot = now;
                     }
                 }
+
+                return updatedEnemy;
             });
+            nextState.enemyBullets = enemyBullets;
 
             // --- Quadtree and Collisions ---
             quadtree.clear();
@@ -514,7 +539,7 @@ scoreGained += enemy.type === 'boss' ? 1000 : 50;
             }
             
             // --- Cleanup & State Transitions ---
-            nextState.enemies = nextState.enemies.filter(e => e.y < GAME_HEIGHT);
+            nextState.enemies = nextState.enemies.filter(e => e.y < GAME_HEIGHT + 100); // Allow enemies to be visible longer
             nextState.powerUps = nextState.powerUps.filter(p => p.y < GAME_HEIGHT);
 
             if (nextState.lives <= 0) {
@@ -762,6 +787,11 @@ const GameCanvas: React.FC = () => {
                         {state.enemyBullets.filter(b => b.active).map(b => <BulletComponent key={`e-${b.id}`} bullet={b} color={COLORS.ENEMY_BULLET} />)}
                         {state.enemies.map(e => <EnemyShip key={e.id} enemy={e} />)}
                         {state.powerUps.map(p => <PowerUpItem key={p.id} powerUp={p} />)}
+                        
+                        {/* Debug Info */}
+                        <text x="10" y="30" fill="white" fontSize="12" fontFamily="monospace">
+                            Enemies: {state.enemies.length} | Queue: {state.enemyQueue.length} | Timer: {state.enemySpawnTimer.toFixed(1)}
+                        </text>
                     </>
                 )}
             </svg>
