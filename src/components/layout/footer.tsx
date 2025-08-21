@@ -8,9 +8,15 @@ const Footer = () => {
           <Link href="/about" className="text-purple-400 hover:text-purple-300 transition-colors text-sm sm:text-base">
             About Us
           </Link>
+          <Link href="/contact" className="text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base">
+            Contact
+          </Link>
           <Link href="/privacy" className="text-green-400 hover:text-green-300 transition-colors text-sm sm:text-base">
             Privacy Policy
           </Link>
+          <a href="/sitemap.xml" className="text-yellow-400 hover:text-yellow-300 transition-colors text-sm sm:text-base">
+            Sitemap
+          </a>
         </div>
         <p className="text-xs sm:text-sm">
           © 2025 Retro Arcade Zone | Powered by Pixels. Built by TeamRetro.

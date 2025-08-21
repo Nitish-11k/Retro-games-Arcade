@@ -199,6 +199,64 @@ export default function ContactPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Sitemap Section */}
+        <div className="mt-12 sm:mt-16">
+          <Card className="bg-gray-800/50 border-gray-700 text-white">
+            <CardHeader className="text-center">
+              <CardTitle className="text-xl sm:text-2xl text-yellow-400">Site Navigation</CardTitle>
+              <p className="text-gray-300 text-sm sm:text-base">Explore all our retro games and pages</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* Games Section */}
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-green-400 text-sm sm:text-base">🎮 Retro Games</h4>
+                  <div className="space-y-1 text-xs sm:text-sm">
+                    <a href="/games/flappy-bird" className="block text-gray-300 hover:text-green-300 transition-colors">Flappy Bird</a>
+                    <a href="/games/pix-man" className="block text-gray-300 hover:text-green-300 transition-colors">Pix Man</a>
+                    <a href="/games/pixel-box" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Box</a>
+                    <a href="/games/pixel-paddle" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Paddle</a>
+                    <a href="/games/pixel-runner" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Runner</a>
+                    <a href="/games/pixel-slither" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Slither</a>
+                    <a href="/games/pixel-velocity" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Velocity</a>
+                    <a href="/games/void-vanguard" className="block text-gray-300 hover:text-green-300 transition-colors">Void Vanguard</a>
+                  </div>
+                </div>
+
+                {/* Pages Section */}
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-blue-400 text-sm sm:text-base">📄 Pages</h4>
+                  <div className="space-y-1 text-xs sm:text-sm">
+                    <a href="/" className="block text-gray-300 hover:text-blue-300 transition-colors">Home</a>
+                    <a href="/about" className="block text-gray-300 hover:text-blue-300 transition-colors">About Us</a>
+                    <a href="/contact" className="block text-gray-300 hover:text-blue-300 transition-colors">Contact</a>
+                    <a href="/privacy" className="block text-gray-300 hover:text-blue-300 transition-colors">Privacy Policy</a>
+                  </div>
+                </div>
+
+                {/* Resources Section */}
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-purple-400 text-sm sm:text-base">🔗 Resources</h4>
+                  <div className="space-y-1 text-xs sm:text-sm">
+                    <a href="/sitemap.xml" className="block text-gray-300 hover:text-purple-300 transition-colors">XML Sitemap</a>
+                    <a href="/robots.txt" className="block text-gray-300 hover:text-purple-300 transition-colors">Robots.txt</a>
+                    <a href="https://retroarcade.in" className="block text-gray-300 hover:text-purple-300 transition-colors">Main Site</a>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 text-center">
+                <a 
+                  href="/sitemap.xml" 
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-semibold py-2 sm:py-3 px-6 sm:px-8 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                >
+                  <span>📋 View Full Sitemap</span>
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
