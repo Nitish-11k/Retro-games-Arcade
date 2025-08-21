@@ -159,6 +159,23 @@ const PixelSlither: React.FC = () => {
     }
   }, [isClient]);
 
+  // Handle window resize for responsive canvas
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (typeof window !== 'undefined') {
+        const cellSize = Math.max(15, Math.min(20, Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6) / GRID_SIZE)));
+        // Force re-render when window resizes
+        setGameState(prev => ({ ...prev }));
+      }
+    };
+
+    if (isClient) {
+      updateCanvasSize();
+      window.addEventListener('resize', updateCanvasSize);
+      return () => window.removeEventListener('resize', updateCanvasSize);
+    }
+  }, [isClient]);
+
   useEffect(() => {
     if (!gameState.gameStarted && isClient) {
       setGameState(getInitialState());
@@ -330,7 +347,7 @@ const PixelSlither: React.FC = () => {
   };
 
   const renderGame = () => {
-    const cellSize = 20;
+    const cellSize = Math.max(15, Math.min(20, Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6) / GRID_SIZE)));
     const canvasSize = GRID_SIZE * cellSize;
     const getHeadRotation = () => {
         if (gameState.direction.y === -1) return 'rotate-0';
@@ -340,8 +357,8 @@ const PixelSlither: React.FC = () => {
         return 'rotate-0';
     };
     return (
-      <div className={`inline-block ${wallBehavior === 'wrap' ? 'border-dashed border-green-400' : 'border-solid border-gray-700'} border-4 transition-all`}>
-        <div className="bg-gray-800 relative overflow-hidden" style={{ width: canvasSize, height: canvasSize }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className={`inline-block ${wallBehavior === 'wrap' ? 'border-dashed border-green-400' : 'border-solid border-gray-700'} border-2 sm:border-4 transition-all`}>
+        <div className="bg-gray-800 relative overflow-hidden" style={{ width: canvasSize, height: canvasSize, maxWidth: '100%', maxHeight: '100%' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <div className="absolute inset-0 opacity-20">
             {Array.from({ length: GRID_SIZE }).map((_, i) => (
               <React.Fragment key={i}>
@@ -367,25 +384,25 @@ const PixelSlither: React.FC = () => {
           </div>
           {/* Game State Overlays - Only one shown at a time */}
           {!gameState.gameStarted && !gameState.gameOver && !gameState.isPaused && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center z-20">
-              <h3 className="text-xl mb-4 font-bold text-yellow-300">PIXEL SLITHER</h3>
-              <p className="text-sm mb-2 text-gray-300">USE WASD OR ARROW KEYS</p>
-              <p className="text-xs text-gray-400">SWIPE ON MOBILE</p>
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-2 text-center z-20">
+              <h3 className="text-base sm:text-lg md:text-xl mb-2 sm:mb-4 font-bold text-yellow-300 leading-tight">PIXEL SLITHER</h3>
+              <p className="text-xs sm:text-sm mb-1 sm:mb-2 text-gray-300 leading-tight">USE WASD OR ARROW KEYS</p>
+              <p className="text-xs text-gray-400 leading-tight">SWIPE ON MOBILE</p>
             </div>
           )}
           {gameState.isPaused && !gameState.gameOver && gameState.gameStarted && (
              <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20">
-              <h3 className="text-2xl font-bold text-yellow-300">PAUSED</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-300 leading-tight">PAUSED</h3>
             </div>
           )}
           {gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-4 text-center z-20">
-              <h3 className="text-2xl mb-2 font-bold text-red-500">GAME OVER</h3>
-              <p className="text-lg mb-2 text-gray-200">SCORE: {gameState.score}</p>
-              <p className="text-sm mb-4 text-yellow-400">
+            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 sm:p-4 text-center z-20">
+              <h3 className="text-lg sm:text-xl md:text-2xl mb-1 sm:mb-2 font-bold text-red-500 leading-tight">GAME OVER</h3>
+              <p className="text-sm sm:text-base md:text-lg mb-1 sm:mb-2 text-gray-200 leading-tight">SCORE: {gameState.score}</p>
+              <p className="text-xs sm:text-sm mb-2 sm:mb-4 text-yellow-400 leading-tight">
                 {gameState.score > 0 && gameState.score === gameData.highScore ? 'NEW HIGH SCORE!' : `BEST: ${gameData.highScore}`}
               </p>
-              <Button onClick={resetGame} className="bg-yellow-400 text-black hover:bg-yellow-300">
+              <Button onClick={resetGame} className="bg-yellow-400 text-black hover:bg-yellow-300 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
                 PLAY AGAIN
               </Button>
             </div>
@@ -433,8 +450,10 @@ const PixelSlither: React.FC = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex justify-center items-center p-2">
-                {renderGame()}
+              <CardContent className="flex justify-center items-center p-2 overflow-hidden">
+                <div className="w-full max-w-full flex justify-center">
+                  {renderGame()}
+                </div>
               </CardContent>
             </Card>
 
