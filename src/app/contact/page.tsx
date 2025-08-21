@@ -1,24 +1,150 @@
-import type { Metadata } from 'next';
-import { Mail, MapPin, Clock } from 'lucide-react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Mail, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export const metadata: Metadata = {
-  title: 'Contact Us - Retro Arcade Zone',
-  description: 'Get in touch with the Retro Arcade Zone team. We\'d love to hear from you!',
-  alternates: { canonical: '/contact' },
-  openGraph: {
-    title: 'Contact Us - Retro Arcade Zone',
-    description: 'Get in touch with the Retro Arcade Zone team. We\'d love to hear from you!',
-    url: 'https://retroarcade.in/contact',
-  },
-  twitter: {
-    title: 'Contact Us - Retro Arcade Zone',
-    description: 'Get in touch with the Retro Arcade Zone team. We\'d love to hear from you!',
-  },
-};
+// EmailJS configuration
+const EMAILJS_SERVICE_ID = 'service_s8rllyw';
+const EMAILJS_TEMPLATE_ID = 'template_contact'; // You'll need to create this template
+const EMAILJS_USER_ID = 'Aovc9JQTWxGqepmpU'; // Your EmailJS Public Key
+
+// TypeScript interface for EmailJS
+declare global {
+  interface Window {
+    emailjs: {
+      init: (userId: string) => void;
+      send: (serviceId: string, templateId: string, templateParams: any) => Promise<{ status: number }>;
+    };
+  }
+}
 
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [emailjsLoaded, setEmailjsLoaded] = useState(false);
+
+  // Load EmailJS script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    script.async = true;
+    script.onload = () => {
+      // @ts-ignore
+      if (window.emailjs) {
+        // @ts-ignore
+        window.emailjs.init(EMAILJS_USER_ID);
+        setEmailjsLoaded(true);
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // Method 1: Try EmailJS if loaded
+      if (emailjsLoaded) {
+        try {
+          // Send email to admin (retroarcade1410@gmail.com)
+          const adminResult = await window.emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+              to_email: 'retroarcade1410@gmail.com',
+              from_name: `${formData.firstName} ${formData.lastName}`,
+              from_email: formData.email,
+              subject: formData.subject,
+              message: formData.message,
+              reply_to: formData.email
+            }
+          );
+
+          // Send automatic response back to user
+          const userResult = await window.emailjs.send(
+            EMAILJS_SERVICE_ID,
+            'template_auto_reply', // You'll need to create this template
+            {
+              to_email: formData.email,
+              to_name: formData.firstName,
+              subject: formData.subject,
+              intent: formData.subject.toLowerCase()
+            }
+          );
+
+          if (adminResult.status === 200 && userResult.status === 200) {
+            setSubmitStatus('success');
+            setSubmitMessage('Message sent successfully! Check your email for our response.');
+            setFormData({
+              firstName: '',
+              lastName: '',
+              email: '',
+              subject: '',
+              message: ''
+            });
+            return;
+          }
+        } catch (emailjsError) {
+          console.error('EmailJS failed, trying fallback:', emailjsError);
+        }
+      }
+
+      // Method 2: Fallback to API route (will log to console for now)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setSubmitMessage('Message sent successfully! We\'ll get back to you within 24 hours.');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      setSubmitStatus('error');
+      setSubmitMessage('Failed to send message. Please try again or email us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
@@ -101,7 +227,7 @@ export default function ContactPage() {
               <CardTitle className="text-xl sm:text-2xl text-purple-400">Send us a Message</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-3 sm:space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
@@ -110,6 +236,10 @@ export default function ContactPage() {
                     <input
                       type="text"
                       id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required
                       className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Your first name"
                     />
@@ -121,6 +251,10 @@ export default function ContactPage() {
                     <input
                       type="text"
                       id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
                       className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Your last name"
                     />
@@ -134,6 +268,10 @@ export default function ContactPage() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="your.email@example.com"
                   />
@@ -145,6 +283,10 @@ export default function ContactPage() {
                   </label>
                   <select
                     id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                   >
                     <option value="">Select a subject</option>
@@ -162,17 +304,48 @@ export default function ContactPage() {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
                     rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="Tell us what's on your mind..."
                   ></textarea>
                 </div>
 
+                {/* Submit Status Message */}
+                {submitStatus !== 'idle' && (
+                  <div className={`p-3 rounded-md flex items-center space-x-2 ${
+                    submitStatus === 'success' 
+                      ? 'bg-green-500/20 border border-green-500/50 text-green-400' 
+                      : 'bg-red-500/20 border border-red-500/50 text-red-400'
+                  }`}>
+                    {submitStatus === 'success' ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4" />
+                    )}
+                    <span className="text-sm">{submitMessage}</span>
+                  </div>
+                )}
+
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </CardContent>
