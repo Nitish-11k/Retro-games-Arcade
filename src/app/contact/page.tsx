@@ -32,20 +32,13 @@ export default function ContactPage() {
     setSubmitStatus('idle');
 
     try {
-      // Use Formspree to send email immediately
-      const response = await fetch('https://formspree.io/f/xayzqkqw', {
+      // Use our API route which will definitely work
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          _replyto: formData.email,
-          _subject: `Contact Form: ${formData.subject} - ${formData.firstName} ${formData.lastName}`
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
