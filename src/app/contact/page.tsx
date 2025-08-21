@@ -217,9 +217,7 @@ export default function ContactPage() {
                     <a href="/games/pix-man" className="block text-gray-300 hover:text-green-300 transition-colors">Pix Man</a>
                     <a href="/games/pixel-box" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Box</a>
                     <a href="/games/pixel-paddle" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Paddle</a>
-                    <a href="/games/pixel-runner" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Runner</a>
                     <a href="/games/pixel-slither" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Slither</a>
-                    <a href="/games/pixel-velocity" className="block text-gray-300 hover:text-green-300 transition-colors">Pixel Velocity</a>
                     <a href="/games/void-vanguard" className="block text-gray-300 hover:text-green-300 transition-colors">Void Vanguard</a>
                   </div>
                 </div>
