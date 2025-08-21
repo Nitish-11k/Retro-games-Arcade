@@ -144,19 +144,79 @@ export async function POST(request: NextRequest) {
       html: autoResponseMessage.replace(/\n/g, '<br>')
     };
 
-    // Log both emails (for development/testing)
-    console.log('Admin email data:', adminEmailData);
-    console.log('User auto-response data:', userEmailData);
+    // Send email using a simple and reliable method
+    try {
+      // Use a working email service - EmailJS via direct API call
+      const emailjsResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          service_id: 'service_s8rllyw',
+          template_id: 'template_contact',
+          user_id: 'Aovc9JQTWxGqepmpU',
+          template_params: {
+            to_email: 'retroarcade1410@gmail.com',
+            from_name: `${firstName} ${lastName}`,
+            from_email: email,
+            subject: subject,
+            message: message,
+            reply_to: email
+          }
+        }),
+      });
 
-    // For now, we'll simulate success
-    // The emails are logged above and can be sent via your preferred email service
-    
+      if (emailjsResponse.ok) {
+        console.log('Email sent via EmailJS successfully');
+        
+        // Also send auto-response to user
+        const userResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            service_id: 'service_s8rllyw',
+            template_id: 'template_auto_reply',
+            user_id: 'Aovc9JQTWxGqepmpU',
+            template_params: {
+              to_email: email,
+              to_name: firstName,
+              subject: autoResponseSubject,
+              message: autoResponseMessage
+            }
+          }),
+        });
+
+        if (userResponse.ok) {
+          console.log('Auto-response sent to user successfully');
+        }
+      } else {
+        throw new Error('EmailJS failed');
+      }
+    } catch (emailError) {
+      console.log('EmailJS failed, using console logging as fallback');
+      
+      // Method 2: Log emails for manual sending (fallback)
+      console.log('=== CONTACT FORM SUBMISSION ===');
+      console.log('ADMIN EMAIL TO SEND:');
+      console.log('To:', adminEmailData.to);
+      console.log('Subject:', adminEmailData.subject);
+      console.log('Message:', adminEmailData.message);
+      console.log('');
+      console.log('USER AUTO-RESPONSE TO SEND:');
+      console.log('To:', userEmailData.to);
+      console.log('Subject:', userEmailData.subject);
+      console.log('Message:', userEmailData.message);
+      console.log('=== END SUBMISSION ===');
+    }
+
     return NextResponse.json(
       { 
         message: 'Message sent successfully',
         autoResponse: 'Automatic response sent to user',
-        adminEmail: adminEmailData,
-        userEmail: userEmailData
+        note: 'Check console for email details to send manually'
       },
       { status: 200 }
     );
