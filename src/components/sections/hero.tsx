@@ -1,12 +1,16 @@
-import Link from 'next/link';
+'use client';
+
 import { Button } from '@/components/ui/button';
-import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
 
 const Hero = () => {
-  const { scrollToSection } = useSmoothScroll();
-
   const handleEnterArcade = () => {
-    scrollToSection('games');
+    const gamesSection = document.getElementById('games');
+    if (gamesSection) {
+      gamesSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
   };
 
   return (
