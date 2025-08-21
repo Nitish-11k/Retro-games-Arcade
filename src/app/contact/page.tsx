@@ -1,24 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Mail, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-// EmailJS configuration
-const EMAILJS_SERVICE_ID = 'service_s8rllyw';
-const EMAILJS_TEMPLATE_ID = 'template_contact'; // You'll need to create this template
-const EMAILJS_USER_ID = 'Aovc9JQTWxGqepmpU'; // Your EmailJS Public Key
-
-// TypeScript interface for EmailJS
-declare global {
-  interface Window {
-    emailjs: {
-      init: (userId: string) => void;
-      send: (serviceId: string, templateId: string, templateParams: any) => Promise<{ status: number }>;
-    };
-  }
-}
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -32,27 +17,6 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
-  const [emailjsLoaded, setEmailjsLoaded] = useState(false);
-
-  // Load EmailJS script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
-    script.async = true;
-    script.onload = () => {
-      // @ts-ignore
-      if (window.emailjs) {
-        // @ts-ignore
-        window.emailjs.init(EMAILJS_USER_ID);
-        setEmailjsLoaded(true);
-      }
-    };
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -68,59 +32,20 @@ export default function ContactPage() {
     setSubmitStatus('idle');
 
     try {
-      // Method 1: Try EmailJS if loaded
-      if (emailjsLoaded) {
-        try {
-          // Send email to admin (retroarcade1410@gmail.com)
-          const adminResult = await window.emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            {
-              to_email: 'retroarcade1410@gmail.com',
-              from_name: `${formData.firstName} ${formData.lastName}`,
-              from_email: formData.email,
-              subject: formData.subject,
-              message: formData.message,
-              reply_to: formData.email
-            }
-          );
-
-          // Send automatic response back to user
-          const userResult = await window.emailjs.send(
-            EMAILJS_SERVICE_ID,
-            'template_auto_reply', // You'll need to create this template
-            {
-              to_email: formData.email,
-              to_name: formData.firstName,
-              subject: formData.subject,
-              intent: formData.subject.toLowerCase()
-            }
-          );
-
-          if (adminResult.status === 200 && userResult.status === 200) {
-            setSubmitStatus('success');
-            setSubmitMessage('Message sent successfully! Check your email for our response.');
-            setFormData({
-              firstName: '',
-              lastName: '',
-              email: '',
-              subject: '',
-              message: ''
-            });
-            return;
-          }
-        } catch (emailjsError) {
-          console.error('EmailJS failed, trying fallback:', emailjsError);
-        }
-      }
-
-      // Method 2: Fallback to API route (will log to console for now)
-      const response = await fetch('/api/contact', {
+      // Use Formspree to send email immediately
+      const response = await fetch('https://formspree.io/f/xayzqkqw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          _replyto: formData.email,
+          _subject: `Contact Form: ${formData.subject} - ${formData.firstName} ${formData.lastName}`
+        }),
       });
 
       if (response.ok) {
