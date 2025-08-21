@@ -347,8 +347,14 @@ const PixelSlither: React.FC = () => {
   };
 
   const renderGame = () => {
-    const cellSize = Math.max(15, Math.min(20, Math.floor(Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6) / GRID_SIZE)));
+    // Calculate responsive cell size with better constraints
+    const maxCanvasWidth = Math.min(400, window.innerWidth * 0.7);
+    const maxCanvasHeight = Math.min(400, window.innerHeight * 0.5);
+    const maxCanvasSize = Math.min(maxCanvasWidth, maxCanvasHeight);
+    
+    const cellSize = Math.max(12, Math.min(20, Math.floor(maxCanvasSize / GRID_SIZE)));
     const canvasSize = GRID_SIZE * cellSize;
+    
     const getHeadRotation = () => {
         if (gameState.direction.y === -1) return 'rotate-0';
         if (gameState.direction.y === 1) return 'rotate-180';
@@ -356,9 +362,32 @@ const PixelSlither: React.FC = () => {
         if (gameState.direction.x === 1) return 'rotate-90';
         return 'rotate-0';
     };
+
+    // Calculate responsive text sizes based on canvas size
+    const getResponsiveTextSize = (baseSize: number, smallSize: number) => {
+      if (canvasSize < 300) return smallSize;
+      if (canvasSize < 350) return baseSize;
+      return baseSize + 1;
+    };
+
+    const titleSize = getResponsiveTextSize(16, 14);
+    const instructionSize = getResponsiveTextSize(14, 12);
+    const smallTextSize = getResponsiveTextSize(12, 10);
+
     return (
       <div className={`inline-block ${wallBehavior === 'wrap' ? 'border-dashed border-green-400' : 'border-solid border-gray-700'} border-2 sm:border-4 transition-all`}>
-        <div className="bg-gray-800 relative overflow-hidden" style={{ width: canvasSize, height: canvasSize, maxWidth: '100%', maxHeight: '100%' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div 
+          className="bg-gray-800 relative overflow-hidden" 
+          style={{ 
+            width: canvasSize, 
+            height: canvasSize, 
+            maxWidth: '100%', 
+            maxHeight: '100%' 
+          }} 
+          onTouchStart={handleTouchStart} 
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Grid lines */}
           <div className="absolute inset-0 opacity-20">
             {Array.from({ length: GRID_SIZE }).map((_, i) => (
               <React.Fragment key={i}>
@@ -367,42 +396,111 @@ const PixelSlither: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
+
+          {/* Snake segments */}
           {gameState.snake.map((segment, index) => (
-            <div key={index} className={`absolute rounded-sm ${index === 0 ? 'bg-green-400' : 'bg-green-600'}`} style={{ left: segment.x * cellSize, top: segment.y * cellSize, width: cellSize, height: cellSize, boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)', transform: 'scale(0.95)' }}>
+            <div 
+              key={index} 
+              className={`absolute rounded-sm ${index === 0 ? 'bg-green-400' : 'bg-green-600'}`} 
+              style={{ 
+                left: segment.x * cellSize, 
+                top: segment.y * cellSize, 
+                width: cellSize, 
+                height: cellSize, 
+                boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)', 
+                transform: 'scale(0.95)' 
+              }}
+            >
               {index === 0 && (
                 <div className={`relative w-full h-full flex items-center justify-center transition-transform duration-100 ${getHeadRotation()}`}>
-                    <div className="flex justify-between w-2/3">
-                        <div className="w-1 h-1 bg-black rounded-full" />
-                        <div className="w-1 h-1 bg-black rounded-full" />
-                    </div>
+                  <div className="flex justify-between w-2/3">
+                    <div className="w-1 h-1 bg-black rounded-full" />
+                    <div className="w-1 h-1 bg-black rounded-full" />
+                  </div>
                 </div>
               )}
             </div>
           ))}
-          <div className={`absolute flex items-center justify-center text-lg ${gameState.food.color}`} style={{ left: gameState.food.x * cellSize, top: gameState.food.y * cellSize, width: cellSize, height: cellSize, borderRadius: '50%', boxShadow: 'inset 2px -2px 2px rgba(0,0,0,0.3)' }}>
-           {gameState.food.char}
+
+          {/* Food */}
+          <div 
+            className={`absolute flex items-center justify-center ${gameState.food.color}`} 
+            style={{ 
+              left: gameState.food.x * cellSize, 
+              top: gameState.food.y * cellSize, 
+              width: cellSize, 
+              height: cellSize, 
+              borderRadius: '50%', 
+              boxShadow: 'inset 2px -2px 2px rgba(0,0,0,0.3)',
+              fontSize: Math.max(8, cellSize * 0.6)
+            }}
+          >
+            {gameState.food.char}
           </div>
+
           {/* Game State Overlays - Only one shown at a time */}
           {!gameState.gameStarted && !gameState.gameOver && !gameState.isPaused && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-2 text-center z-20">
-              <h3 className="text-base sm:text-lg md:text-xl mb-2 sm:mb-4 font-bold text-yellow-300 leading-tight">PIXEL SLITHER</h3>
-              <p className="text-xs sm:text-sm mb-1 sm:mb-2 text-gray-300 leading-tight">USE WASD OR ARROW KEYS</p>
-              <p className="text-xs text-gray-400 leading-tight">SWIPE ON MOBILE</p>
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-1 text-center z-20">
+              <h3 
+                className="font-bold text-yellow-300 leading-tight mb-1 sm:mb-2" 
+                style={{ fontSize: `${titleSize}px` }}
+              >
+                PIXEL SLITHER
+              </h3>
+              <p 
+                className="text-gray-300 leading-tight mb-1" 
+                style={{ fontSize: `${instructionSize}px` }}
+              >
+                USE WASD OR ARROW KEYS
+              </p>
+              <p 
+                className="text-gray-400 leading-tight" 
+                style={{ fontSize: `${smallTextSize}px` }}
+              >
+                SWIPE ON MOBILE
+              </p>
             </div>
           )}
+
           {gameState.isPaused && !gameState.gameOver && gameState.gameStarted && (
-             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-300 leading-tight">PAUSED</h3>
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20">
+              <h3 
+                className="font-bold text-yellow-300 leading-tight" 
+                style={{ fontSize: `${titleSize}px` }}
+              >
+                PAUSED
+              </h3>
             </div>
           )}
+
           {gameState.gameOver && (
-            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 sm:p-4 text-center z-20">
-              <h3 className="text-lg sm:text-xl md:text-2xl mb-1 sm:mb-2 font-bold text-red-500 leading-tight">GAME OVER</h3>
-              <p className="text-sm sm:text-base md:text-lg mb-1 sm:mb-2 text-gray-200 leading-tight">SCORE: {gameState.score}</p>
-              <p className="text-xs sm:text-sm mb-2 sm:mb-4 text-yellow-400 leading-tight">
+            <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-1 text-center z-20">
+              <h3 
+                className="font-bold text-red-500 leading-tight mb-1" 
+                style={{ fontSize: `${titleSize}px` }}
+              >
+                GAME OVER
+              </h3>
+              <p 
+                className="text-gray-200 leading-tight mb-1" 
+                style={{ fontSize: `${instructionSize}px` }}
+              >
+                SCORE: {gameState.score}
+              </p>
+              <p 
+                className="text-yellow-400 leading-tight mb-2" 
+                style={{ fontSize: `${smallTextSize}px` }}
+              >
                 {gameState.score > 0 && gameState.score === gameData.highScore ? 'NEW HIGH SCORE!' : `BEST: ${gameData.highScore}`}
               </p>
-              <Button onClick={resetGame} className="bg-yellow-400 text-black hover:bg-yellow-300 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
+              <Button 
+                onClick={resetGame} 
+                className="bg-yellow-400 text-black hover:bg-yellow-300"
+                style={{ 
+                  fontSize: `${smallTextSize}px`,
+                  padding: `${Math.max(4, cellSize * 0.2)}px ${Math.max(8, cellSize * 0.4)}px`
+                }}
+              >
                 PLAY AGAIN
               </Button>
             </div>
@@ -435,7 +533,7 @@ const PixelSlither: React.FC = () => {
                   <div className="flex gap-2">
                     {!gameState.gameStarted || gameState.gameOver ? (
                       <Button onClick={startGame} className="bg-yellow-400 text-black hover:bg-yellow-300 text-xs sm:text-sm px-3 sm:px-4 py-2" disabled={!levels.find(l => l.id === selectedLevel)?.unlocked}>
-                        <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />START
+                        <Play className="w-3 h-3 sm:w-4 sm:w-4 mr-1 sm:mr-2" />START
                       </Button>
                     ) : (
                       <>
@@ -451,7 +549,7 @@ const PixelSlither: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex justify-center items-center p-2 overflow-hidden">
-                <div className="w-full max-w-full flex justify-center">
+                <div className="w-full flex justify-center items-center min-h-[300px]">
                   {renderGame()}
                 </div>
               </CardContent>
