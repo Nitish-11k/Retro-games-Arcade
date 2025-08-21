@@ -137,6 +137,25 @@ export class Ghost {
       }
     }
     
+    // Handle eaten ghost respawn
+    if (this.state === GhostState.EATEN) {
+      // Check if ghost has reached the ghost house
+      const ghostHouseX = 10 * TILE_SIZE + TILE_SIZE / 2;
+      const ghostHouseY = 10 * TILE_SIZE + TILE_SIZE / 2;
+      const distanceToHouse = Math.hypot(this.x - ghostHouseX, this.y - ghostHouseY);
+      
+      if (distanceToHouse < TILE_SIZE) {
+        // Ghost has reached the house, wait a bit then respawn
+        setTimeout(() => {
+          this.state = GhostState.CHASE;
+          this.x = this.initialX;
+          this.y = this.initialY;
+          this.dx = Math.random() < 0.5 ? 1 : -1;
+          this.dy = 0;
+        }, 2000); // Wait 2 seconds before respawning
+      }
+    }
+    
     // Blinky's speed boost
     if (this.personality === 'blinky') {
         const pelletThresholds = [20, 10]; // Pellets remaining to speed up
@@ -152,9 +171,10 @@ export class Ghost {
     this.updateTargetTile(player, ghosts);
     this.moveTowardsTarget();
 
-    if (this.state === GhostState.EATEN && Math.hypot(this.x - this.initialX, this.y - this.initialY) < TILE_SIZE) {
-        this.state = GhostState.CHASE;
-    }
+    // Remove the old respawn logic since we handle it above
+    // if (this.state === GhostState.EATEN && Math.hypot(this.x - this.initialX, this.y - this.initialY) < TILE_SIZE) {
+    //     this.state = GhostState.CHASE;
+    // }
   }
 
   updateTargetTile(player: Player, ghosts: Ghost[]) {
@@ -166,7 +186,8 @@ export class Ghost {
         this.targetTile = { x: this.scatterTarget.x, y: this.scatterTarget.y };
         break;
       case GhostState.EATEN:
-        this.targetTile = { x: Math.floor(this.initialX/TILE_SIZE), y: Math.floor(this.initialY/TILE_SIZE) };
+        // Ghost house center position (middle of the ghost house area)
+        this.targetTile = { x: 10, y: 10 }; // Center of the ghost house
         break;
       case GhostState.FRIGHTENED:
         const currentGridX = Math.floor(this.x / TILE_SIZE);
@@ -221,30 +242,74 @@ export class Ghost {
         this.x = currentGridX * TILE_SIZE + TILE_SIZE / 2;
         this.y = currentGridY * TILE_SIZE + TILE_SIZE / 2;
 
-        const startNode = new GraphNode(currentGridX, currentGridY);
-        const targetX = Math.max(0, Math.min(MAP[0].length - 1, this.targetTile.x));
-        const targetY = Math.max(0, Math.min(MAP.length - 1, this.targetTile.y));
-        const endNode = new GraphNode(targetX, targetY);
-
-        // Prevent ghosts from reversing direction
+        // Simple direction finding to target
+        const targetGridX = Math.floor(this.targetTile.x);
+        const targetGridY = Math.floor(this.targetTile.y);
+        
+        // Get valid directions (not walls)
+        const validDirections = [];
+        if (MAP[currentGridY]?.[currentGridX - 1] !== 1) validDirections.push({ dx: -1, dy: 0 });
+        if (MAP[currentGridY]?.[currentGridX + 1] !== 1) validDirections.push({ dx: 1, dy: 0 });
+        if (MAP[currentGridY - 1]?.[currentGridX] !== 1) validDirections.push({ dx: 0, dy: -1 });
+        if (MAP[currentGridY + 1]?.[currentGridX] !== 1) validDirections.push({ dx: 0, dy: 1 });
+        
+        // Prevent reversing direction (ghosts can't turn 180 degrees)
         const oppositeDx = -this.dx;
         const oppositeDy = -this.dy;
-
-        const path = mazeGraph.findShortestPath(startNode, endNode, {dx: oppositeDx, dy: oppositeDy});
-
-        if (path && path.length > 1) {
-            const nextNode = path[1];
-            this.dx = nextNode.x - currentGridX;
-            this.dy = nextNode.y - currentGridY;
+        const filteredDirections = validDirections.filter(dir => 
+          !(dir.dx === oppositeDx && dir.dy === oppositeDy)
+        );
+        
+        if (filteredDirections.length > 0) {
+          // Choose best direction towards target
+          let bestDirection = filteredDirections[0];
+          let bestDistance = Infinity;
+          
+          for (const dir of filteredDirections) {
+            const nextX = currentGridX + dir.dx;
+            const nextY = currentGridY + dir.dy;
+            const distance = Math.hypot(targetGridX - nextX, targetGridY - nextY);
+            
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestDirection = dir;
+            }
+          }
+          
+          this.dx = bestDirection.dx;
+          this.dy = bestDirection.dy;
         }
     }
 
-    this.speed = this.state === GhostState.FRIGHTENED ? this.baseSpeed * 0.75 : this.state === GhostState.EATEN ? 4 : this.baseSpeed;
+    // Set speed based on ghost state
+    if (this.state === GhostState.FRIGHTENED) {
+      this.speed = this.baseSpeed * 0.75;
+    } else if (this.state === GhostState.EATEN) {
+      this.speed = 4; // Fast movement when returning to ghost house
+    } else {
+      this.speed = this.baseSpeed;
+    }
+    
     this.x += this.dx * this.speed;
     this.y += this.dy * this.speed;
 
-    if (this.x < 0) this.x = MAP[0].length * TILE_SIZE - TILE_SIZE;
-    if (this.x > MAP[0].length * TILE_SIZE) this.x = TILE_SIZE;
+    // Better boundary checking - keep ghosts within the maze
+    if (this.x < TILE_SIZE) {
+      this.x = TILE_SIZE;
+      this.dx = Math.abs(this.dx); // Force positive direction
+    }
+    if (this.x > (MAP[0].length - 1) * TILE_SIZE) {
+      this.x = (MAP[0].length - 1) * TILE_SIZE;
+      this.dx = -Math.abs(this.dx); // Force negative direction
+    }
+    if (this.y < TILE_SIZE) {
+      this.y = TILE_SIZE;
+      this.dy = Math.abs(this.dy); // Force positive direction
+    }
+    if (this.y > (MAP.length - 1) * TILE_SIZE) {
+      this.y = (MAP.length - 1) * TILE_SIZE;
+      this.dy = -Math.abs(this.dy); // Force negative direction
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {

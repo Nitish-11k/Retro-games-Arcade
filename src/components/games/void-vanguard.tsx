@@ -32,6 +32,7 @@ const INITIAL_LIVES = 3;
 const PLAYER_BULLET_POOL_SIZE = 50;
 const ENEMY_BULLET_POOL_SIZE = 100;
 const POWER_UP_DROP_CHANCE = 0.15; // 15% chance to drop a power-up
+const MAX_LEVELS = 10; // Total number of levels
 
 const COLORS = {
     BACKGROUND: '#0A0A1E',
@@ -246,29 +247,38 @@ const createInitialState = (): GameState => ({
 
 const spawnWave = (level: number): Enemy[] => {
     const enemies: Enemy[] = [];
-    const rows = 2 + Math.min(level, 5);
-    const cols = 8;
-    const enemyWidth = 50;
-    const enemyHeight = 30;
-    const horizontalGap = (GAME_WIDTH - cols * enemyWidth) / (cols + 1);
-
-    const wave: Enemy[] = [];
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            wave.push({
-                id: Date.now() + (row * cols + col),
-                x: horizontalGap * (col + 1) + col * enemyWidth,
-                y: -50 - (row * 60), // Start above screen, staggered
-                width: enemyWidth,
-                height: enemyHeight,
-type: 'standard',
-                hp: 1 + Math.floor(level / 2),
-                lastShot: 0,
-            });
-        }
+    
+    // Difficulty scaling based on level
+    const maxEnemiesPerWave = 3 + Math.min(level, 7); // 3-10 enemies per wave
+    const enemyHealth = 1 + Math.floor(level / 3); // Health increases every 3 levels
+    
+    // Spawn enemies in smaller groups from the top
+    for (let i = 0; i < maxEnemiesPerWave; i++) {
+        // Random horizontal position across the screen width
+        const x = Math.random() * (GAME_WIDTH - 80) + 40; // Keep enemies within screen bounds
+        
+        // Staggered vertical positions so they don't all appear at once
+        const y = -50 - (i * 30); // Start above screen, staggered
+        
+        // Randomize enemy properties based on level
+        const isStronger = Math.random() < (level / 10); // Higher levels have more strong enemies
+        const bonusHealth = isStronger ? Math.floor(level / 4) : 0;
+        
+        enemies.push({
+            id: Date.now() + i,
+            x: x,
+            y: y,
+            width: 40,
+            height: 30,
+            type: 'standard',
+            hp: enemyHealth + bonusHealth,
+            direction: 1,
+            bossState: undefined,
+            attackTimer: 0
+        });
     }
-    // Return sorted so they spawn from the top row first
-    return wave.sort((a, b) => b.y - a.y);
+    
+    return enemies;
 };
 
 const gameReducer = (state: GameState, action: Action): GameState => {
@@ -366,77 +376,50 @@ return { ...createInitialState(), status: 'PLAYING', enemyQueue: spawnWave(1) };
 nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { ...b, y: b.y + b.vy * dt, x: b.x + b.vx * dt, active: b.y < GAME_HEIGHT && b.y > -BULLET_HEIGHT && b.x > -BULLET_WIDTH && b.x < GAME_WIDTH } : b);
             nextState.powerUps = nextState.powerUps.map(p => ({ ...p, y: p.y + POWER_UP_SPEED * dt }));
             
-            // --- Enemy Movement & Boss Logic ---
-            const enemyBullets = [...nextState.enemyBullets];
-            nextState.enemies = nextState.enemies.map(enemy => {
-                 if (enemy.type === 'boss') {
-                    let newBoss = { ...enemy };
-                    // Boss State Machine
-                    switch(newBoss.bossState) {
-                        case 'ENTERING':
-                            newBoss.y += ENEMY_SPEED * dt * 0.5;
-                            if (newBoss.y >= 50) {
-                                newBoss.y = 50;
-                                newBoss.bossState = 'PHASE_1';
-                                newBoss.attackTimer = 2; // Start firing after 2s
-                            }
-                            break;
-                        case 'PHASE_1':
-                        case 'PHASE_2':
-                            // Movement
-                            let newX = newBoss.x + ENEMY_SPEED * dt * (newBoss.direction || 1) * (newBoss.bossState === 'PHASE_2' ? 1.5 : 1);
-                            if (newX <= 0 || newX + newBoss.width >= GAME_WIDTH) {
-                                newBoss.direction = -(newBoss.direction || 1);
-                            }
-                            newBoss.x = newX;
-                            
-                            // Attacking
-                            newBoss.attackTimer! -= dt;
-                            if (newBoss.attackTimer! <= 0) {
-                                const fire = (vx: number, vy: number) => {
-                                    const bulletIndex = enemyBullets.findIndex(b => !b.active);
-                                    if(bulletIndex !== -1) {
-                                        enemyBullets[bulletIndex] = { ...enemyBullets[bulletIndex], active: true, x: newBoss.x + newBoss.width / 2, y: newBoss.y + newBoss.height, vx, vy };
-                                    }
-                                }
-                                if (newBoss.bossState === 'PHASE_1') {
-                                    fire(0, ENEMY_BULLET_SPEED);
-                                    newBoss.attackTimer = 1.5;
-                                } else { // PHASE_2
-                                    fire(0, ENEMY_BULLET_SPEED * 1.2);
-                                    fire(-100, ENEMY_BULLET_SPEED * 0.9);
-                                    fire(100, ENEMY_BULLET_SPEED * 0.9);
-                                    newBoss.attackTimer = 1;
-                                }
-                            }
-                            // Check for phase transition
-                            if (newBoss.hp < 50 && newBoss.bossState === 'PHASE_1') {
-                                newBoss.bossState = 'PHASE_2';
-                            }
-                            break;
+            // --- Enemy Movement & AI ---
+            nextState.enemies.forEach(enemy => {
+                if (enemy.type === 'boss') {
+                    // Boss movement logic
+                    if (enemy.bossState === 'ENTERING') {
+                        enemy.y += 50 * dt;
+                        if (enemy.y >= 50) {
+                            enemy.bossState = 'PHASE_1';
+                            enemy.y = 50;
+                        }
+                    } else if (enemy.bossState === 'PHASE_1' || enemy.bossState === 'PHASE_2') {
+                        // Ensure direction is defined
+                        if (enemy.direction === undefined) enemy.direction = 1;
+                        
+                        enemy.x += enemy.direction * 100 * dt;
+                        if (enemy.x <= 50 || enemy.x >= GAME_WIDTH - 150) {
+                            enemy.direction *= -1;
+                        }
                     }
-                     return newBoss;
-                }
-
-                // Standard enemy logic
-                const newY = enemy.y + ENEMY_SPEED * dt;
-                let updatedEnemy = { ...enemy, y: newY, lastShot: enemy.lastShot || now };
-
-                // Standard enemy firing logic
-                if (now - updatedEnemy.lastShot > ENEMY_FIRE_RATE * 1000 && updatedEnemy.y > 0) {
-                    const bulletIndex = enemyBullets.findIndex(b => !b.active);
-                    if (bulletIndex !== -1 && updatedEnemy.y > 0) {
-                        const enemyCenter = updatedEnemy.x + updatedEnemy.width / 2;
-                        const vx = 0; // Bullets travel straight down
-                        const vy = ENEMY_BULLET_SPEED; // Downward speed
-                        enemyBullets[bulletIndex] = { ...enemyBullets[bulletIndex], active: true, x: enemyCenter, y: updatedEnemy.y + updatedEnemy.height, vx, vy };
-                        updatedEnemy.lastShot = now;
+                } else {
+                    // Regular enemy movement - move down with some horizontal variation
+                    const baseSpeed = ENEMY_SPEED + (nextState.level * 3); // Speed increases with level
+                    
+                    // Ensure direction is defined
+                    if (enemy.direction === undefined) enemy.direction = 1;
+                    
+                    // Add some horizontal movement for variety
+                    if (Math.random() < 0.01) { // 1% chance to change direction each frame
+                        enemy.direction = Math.random() < 0.5 ? 1 : -1;
+                    }
+                    
+                    // Move down (primary movement)
+                    enemy.y += baseSpeed * dt;
+                    
+                    // Move horizontally (secondary movement)
+                    enemy.x += enemy.direction * (baseSpeed * 0.3) * dt;
+                    
+                    // Bounce off screen edges
+                    if (enemy.x <= 0 || enemy.x >= GAME_WIDTH - enemy.width) {
+                        enemy.direction *= -1;
+                        enemy.x = Math.max(0, Math.min(enemy.x, GAME_WIDTH - enemy.width));
                     }
                 }
-
-                return updatedEnemy;
             });
-            nextState.enemyBullets = enemyBullets;
 
             // --- Quadtree and Collisions ---
             quadtree.clear();
@@ -471,7 +454,7 @@ nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { ...b, y: b
 scoreGained += enemy.type === 'boss' ? 1000 : 50;
                             if (enemy.type === 'boss') {
                                 enemy.bossState = 'DEFEATED';
-                                nextState.status = nextState.level >= 2 ? 'YOU_WIN' : 'LEVEL_COMPLETE';
+                                nextState.status = nextState.level >= MAX_LEVELS ? 'YOU_WIN' : 'LEVEL_COMPLETE';
                             } else {
                                 // Random Power-up Drop
                                 if (Math.random() < POWER_UP_DROP_CHANCE) {
@@ -538,17 +521,30 @@ scoreGained += enemy.type === 'boss' ? 1000 : 50;
                 nextState.status = 'GAME_OVER';
             }
             
-            // Boss spawn logic
-            // Boss spawn logic
-            const scoreThreshold = nextState.level === 1 ? 2700 : 3400;
-            if (nextState.score >= scoreThreshold && !nextState.bossSpawned) {
+            // Boss spawn logic - only on specific levels with proper difficulty scaling
+            const bossLevels = [3, 5, 7, 10]; // Boss appears on levels 3, 5, 7, and 10
+            const isBossLevel = bossLevels.includes(nextState.level);
+            const scoreThreshold = isBossLevel ? (nextState.level * 800) : (nextState.level * 600);
+            
+            if (nextState.score >= scoreThreshold && !nextState.bossSpawned && isBossLevel) {
                 nextState.bossSpawned = true;
                 nextState.enemyQueue = []; // Clear the queue to stop other enemies
+                
+                // Boss difficulty increases with level
+                const bossHealth = 150 + (nextState.level * 50);
+                const bossSize = 100 + (nextState.level * 10);
+                
                 nextState.enemies.push({
-                    id: Date.now() - 1, x: GAME_WIDTH / 2 - 50, y: -100,
-                    width: 100, height: 50, type: 'boss',
-                    hp: 100 * nextState.level, direction: 1,
-                    bossState: 'ENTERING', attackTimer: 0
+                    id: Date.now() - 1, 
+                    x: GAME_WIDTH / 2 - bossSize / 2, 
+                    y: -100,
+                    width: bossSize, 
+                    height: bossSize / 2, 
+                    type: 'boss',
+                    hp: bossHealth, 
+                    direction: 1,
+                    bossState: 'ENTERING', 
+                    attackTimer: 0
                 });
             }
 
@@ -648,6 +644,15 @@ const StatsSidebar: React.FC = () => {
                 </div>
                 <div className="text-center pt-2 border-t border-yellow-300/20">
                     <Badge variant="outline" className="text-yellow-300 border-yellow-300/50">LEVEL {state.level}</Badge>
+                    <div className="mt-2 text-xs text-gray-400">
+                        Progress: {state.level} / {MAX_LEVELS}
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-1 mt-1">
+                        <div 
+                            className="bg-yellow-400 h-1 rounded-full transition-all duration-300"
+                            style={{ width: `${(state.level / MAX_LEVELS) * 100}%` }}
+                        ></div>
+                    </div>
                 </div>
                 {state.activePowerUp && (
                     <div className="text-center pt-2 border-t border-green-400/20">
@@ -681,9 +686,36 @@ const GameOverScreen = ({ score, onRestart }: { score: number; onRestart: () => 
     </GameOverlay>
 );
 
+const getLevelDescription = (level: number): string => {
+    if (level <= 3) return "Basic Formation - Learn the basics";
+    if (level <= 6) return "Staggered Enemies - More challenging patterns";
+    if (level <= 9) return "Diamond Formation - Advanced tactics required";
+    if (level === 10) return "Final Challenge - Ultimate test of skill";
+    return "Unknown Level";
+};
+
 const LevelCompleteScreen = ({ level, onNext }: { level: number; onNext: () => void }) => (
     <GameOverlay title={`LEVEL ${level} CLEARED`} buttonText={`Start Level ${level + 1}`} onButtonClick={onNext}>
-        <p className="text-xl text-green-400">Level Bonus: +{(level + 1) * 100}!</p>
+        <div className="text-center space-y-4">
+            <p className="text-xl text-green-400">Level Bonus: +{(level + 1) * 100}!</p>
+            <div className="bg-gray-800 p-4 rounded-lg">
+                <p className="text-lg text-blue-400 mb-2">Progress: {level} / {MAX_LEVELS}</p>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${(level / MAX_LEVELS) * 100}%` }}
+                    ></div>
+                </div>
+            </div>
+            {level < MAX_LEVELS ? (
+                <div>
+                    <p className="text-sm text-gray-400 mb-2">Ready for the next challenge?</p>
+                    <p className="text-xs text-purple-400">{getLevelDescription(level + 1)}</p>
+                </div>
+            ) : (
+                <p className="text-lg text-yellow-400 font-bold">Final level completed!</p>
+            )}
+        </div>
     </GameOverlay>
 );
 

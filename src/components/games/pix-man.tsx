@@ -56,8 +56,16 @@ const PixManGame = () => {
   const resetLevel = useCallback((newLevel: number) => {
     setLevel(newLevel);
     mapRef.current = JSON.parse(JSON.stringify(MAP));
-    const initialPelletCount = mapRef.current.flat().filter((tile: number) => tile === 0 || tile === 3).length;
-    pellets.current = initialPelletCount;
+    // Count pellets more accurately
+    let pelletCount = 0;
+    for (let row = 0; row < mapRef.current.length; row++) {
+      for (let col = 0; col < mapRef.current[0].length; col++) {
+        if (mapRef.current[row][col] === 0 || mapRef.current[row][col] === 3) {
+          pelletCount++;
+        }
+      }
+    }
+    pellets.current = pelletCount;
     
     player.current = new Player(PLAYER.x, PLAYER.y);
     ghosts.current = GHOSTS.map(g => new Ghost(g.x, g.y, g.color, g.personality, newLevel));
@@ -110,13 +118,18 @@ const PixManGame = () => {
         const gridX = Math.floor(player.current.x / TILE_SIZE);
         const gridY = Math.floor(player.current.y / TILE_SIZE);
 
+        // Collect pellets
         if (mapRef.current[gridY]?.[gridX] === 0) {
-            mapRef.current[gridY][gridX] = 5;
+            mapRef.current[gridY][gridX] = 5; // Mark as collected
             setScore(prev => prev + 10);
             pellets.current--;
+            console.log(`Pellet collected! Pellets remaining: ${pellets.current}`); // Debug log
         } else if (mapRef.current[gridY]?.[gridX] === 3) {
-            mapRef.current[gridY][gridX] = 5;
+            mapRef.current[gridY][gridX] = 5; // Mark as collected
             setScore(prev => prev + 50);
+            pellets.current--;
+            console.log(`Power pellet collected! Pellets remaining: ${pellets.current}`); // Debug log
+            
             if (settings.frightenedTime > 0) {
                 ghosts.current.forEach(g => {
                     if (g.state !== GhostState.EATEN) {
@@ -125,6 +138,13 @@ const PixManGame = () => {
                     }
                 });
             }
+        }
+
+        // Check for level completion
+        if (pellets.current <= 0) {
+            console.log('Level completed! All pellets collected!'); // Debug log
+            setGameState(GameState.LEVEL_COMPLETE);
+            stateTimer.current = 3000;
         }
 
         for (const ghost of ghosts.current) {
@@ -141,10 +161,6 @@ const PixManGame = () => {
             }
         }
 
-        if (pellets.current === 0) {
-            setGameState(GameState.LEVEL_COMPLETE);
-            stateTimer.current = 3000;
-        }
         break;
         
       case GameState.PACMAN_DEATH_ANIMATION:
@@ -249,6 +265,11 @@ const PixManGame = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default browser behavior for arrow keys and other game keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+      }
+      
       if (gameState === GameState.PLAYING && player.current) {
         switch (e.key) {
           case 'ArrowUp': case 'w': player.current.nextDirection = { dx: 0, dy: -1 }; break;
@@ -359,6 +380,10 @@ const PixManGame = () => {
               <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
                 <div className="text-lg font-bold text-white">ARROW KEYS</div>
                 <div className="text-xs text-blue-400/80">TO MOVE</div>
+              </div>
+              <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                <div className="text-lg font-bold text-white">PELLETS LEFT</div>
+                <div className="text-xl text-green-400">{pellets.current}</div>
               </div>
             </CardContent>
           </Card>
