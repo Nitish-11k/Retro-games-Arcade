@@ -677,19 +677,84 @@ const PixelSlither: React.FC = () => {
               </Button>
             )}
 
-            <Card className="bg-gray-800 border-2 border-green-400">
-               <CardHeader className="pb-2"><CardTitle className="text-green-400 text-xs sm:text-sm">RECORDS</CardTitle></CardHeader>
-               <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                   <Dialog><DialogTrigger asChild>
-                      <Button className="w-full bg-green-600 text-white hover:bg-green-500 text-xs sm:text-sm py-2"><Trophy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />LEADERBOARD</Button>
-                    </DialogTrigger><DialogContent className="bg-gray-900 border-green-400 text-gray-200"><DialogHeader><DialogTitle className="text-green-400">LEADERBOARD</DialogTitle></DialogHeader>
-                    <Tabs defaultValue="global" className="w-full"><TabsList className="grid w-full grid-cols-2 bg-gray-800 border-green-400/50"><TabsTrigger value="global">GLOBAL</TabsTrigger><TabsTrigger value="friends" disabled>FRIENDS</TabsTrigger></TabsList>
-                    <TabsContent value="global"><ScrollArea className="h-72 pr-3">{gameData.leaderboard.length > 0 ? gameData.leaderboard.map((entry: LeaderboardEntry, i: number) => (<div key={i} className="flex items-center justify-between p-2 my-1 bg-green-500/10 border-l-2 border-green-500"><div className="flex items-center gap-3"><Badge variant="secondary" className="bg-green-500/50">#{i+1}</Badge><span>{entry.name}</span></div><span className="font-bold">{entry.score}</span></div>)) : <p className="text-center py-8">NO SCORES YET!</p>}</ScrollArea></TabsContent></Tabs></DialogContent>
+            <Card className="bg-gray-800 border-2 border-green-400 shadow-[4px_4px_0px_#22C55E]">
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-green-400 text-sm sm:text-base font-bold">RECORDS</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-3">
+                   <Dialog>
+                     <DialogTrigger asChild>
+                       <Button className="w-full bg-green-600 hover:bg-green-500 text-white text-sm sm:text-base py-3 border-2 border-green-500 shadow-[2px_2px_0px_#15803D]">
+                         <Trophy className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                         LEADERBOARD
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="bg-gray-900 border-green-400 text-gray-200">
+                       <DialogHeader>
+                         <DialogTitle className="text-green-400">LEADERBOARD</DialogTitle>
+                       </DialogHeader>
+                       <Tabs defaultValue="global" className="w-full">
+                         <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-green-400/50">
+                           <TabsTrigger value="global">GLOBAL</TabsTrigger>
+                           <TabsTrigger value="friends" disabled>FRIENDS</TabsTrigger>
+                         </TabsList>
+                         <TabsContent value="global">
+                           <ScrollArea className="h-72 pr-3">
+                             {gameData.leaderboard.length > 0 ? 
+                               gameData.leaderboard.map((entry: LeaderboardEntry, i: number) => (
+                                 <div key={i} className="flex items-center justify-between p-2 my-1 bg-green-500/10 border-l-2 border-green-500">
+                                   <div className="flex items-center gap-3">
+                                     <Badge variant="secondary" className="bg-green-500/50">#{i+1}</Badge>
+                                     <span>{entry.name}</span>
+                                   </div>
+                                   <span className="font-bold">{entry.score}</span>
+                                 </div>
+                               )) : 
+                               <p className="text-center py-8">NO SCORES YET!</p>
+                             }
+                           </ScrollArea>
+                         </TabsContent>
+                       </Tabs>
+                     </DialogContent>
                    </Dialog>
-                   <Dialog><DialogTrigger asChild>
-                      <Button className="w-full bg-yellow-600 text-white hover:bg-yellow-500 text-xs sm:text-sm py-2"><Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />ACHIEVEMENTS</Button>
-                    </DialogTrigger><DialogContent className="bg-gray-900 border-yellow-400 text-gray-200"><DialogHeader><DialogTitle className="text-yellow-400">ACHIEVEMENTS</DialogTitle></DialogHeader>
-                    <ScrollArea className="h-80 pr-3"><div className="space-y-3">{achievements.map((a) => { const Icon = iconMap[a.iconName as IconName]; return (<div key={a.id} className={`p-3 border ${a.unlocked ? 'bg-yellow-400/10 border-yellow-400' : 'bg-gray-800 border-gray-700 opacity-60'}`}><div className="flex items-center gap-3 mb-2"><div className={`p-2 ${a.unlocked ? 'bg-yellow-400' : 'bg-gray-700'}`}><Icon className={`w-4 h-4 ${a.unlocked ? 'text-black' : 'text-gray-200'}`} /></div><div className="flex-1"><h4 className="font-bold text-sm">{a.name}</h4><p className="text-xs text-gray-400">{a.description}</p></div>{a.unlocked && (<Badge className="bg-yellow-400 text-black">✓</Badge>)}</div><Progress value={(a.current/a.requirement)*100} className="h-1 [&>div]:bg-yellow-400" /><p className="text-xs text-gray-500 mt-1 text-right">{a.current} / {a.requirement}</p></div>);})}</div></ScrollArea></DialogContent>
+                   
+                   <Dialog>
+                     <DialogTrigger asChild>
+                       <Button className="w-full bg-orange-600 hover:bg-orange-500 text-white text-sm sm:text-base py-3 border-2 border-orange-500 shadow-[2px_2px_0px_#C2410C]">
+                         <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                         ACHIEVEMENTS
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="bg-gray-900 border-yellow-400 text-gray-200">
+                       <DialogHeader>
+                         <DialogTitle className="text-yellow-400">ACHIEVEMENTS</DialogTitle>
+                       </DialogHeader>
+                       <ScrollArea className="h-80 pr-3">
+                         <div className="space-y-3">
+                           {achievements.map((a) => { 
+                             const Icon = iconMap[a.iconName as IconName]; 
+                             return (
+                               <div key={a.id} className={`p-3 border ${a.unlocked ? 'bg-yellow-400/10 border-yellow-400' : 'bg-gray-800 border-gray-700 opacity-60'}`}>
+                                 <div className="flex items-center gap-3 mb-2">
+                                   <div className={`p-2 ${a.unlocked ? 'bg-yellow-400' : 'bg-gray-700'}`}>
+                                     <Icon className={`w-4 h-4 ${a.unlocked ? 'text-black' : 'text-gray-200'}`} />
+                                   </div>
+                                   <div className="flex-1">
+                                     <h4 className="font-bold text-sm">{a.name}</h4>
+                                     <p className="text-xs text-gray-400">{a.description}</p>
+                                   </div>
+                                   {a.unlocked && (
+                                     <Badge className="bg-yellow-400 text-black">✓</Badge>
+                                   )}
+                                 </div>
+                                 <Progress value={(a.current/a.requirement)*100} className="h-1 [&>div]:bg-yellow-400" />
+                                 <p className="text-xs text-gray-500 mt-1 text-right">{a.current} / {a.requirement}</p>
+                               </div>
+                             );
+                           })}
+                         </div>
+                       </ScrollArea>
+                     </DialogContent>
                    </Dialog>
                </CardContent>
             </Card>
