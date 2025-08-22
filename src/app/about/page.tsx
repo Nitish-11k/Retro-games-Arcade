@@ -1,17 +1,7 @@
-import type { Metadata } from 'next';
+'use client';
+
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-
-export const metadata: Metadata = {
-  title: 'About Retro Arcade Zone',
-  description: 'Learn about TeamRetro and our mission to bring classic arcade games to your browser.',
-  alternates: { canonical: '/about' },
-  openGraph: {
-    title: 'About Retro Arcade Zone',
-    description: 'Learn about TeamRetro and our mission to bring classic arcade games to your browser.',
-    url: 'https://retroarcade.in/about',
-  },
-};
 
 const AboutPage = () => {
   return (

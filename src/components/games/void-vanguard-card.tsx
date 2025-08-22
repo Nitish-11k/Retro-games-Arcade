@@ -12,18 +12,26 @@ const VoidVanguardCard = () => {
       <div className="relative">
         <div className="h-48 bg-black border-b-2 border-indigo-500 relative overflow-hidden flex items-center justify-center p-4">
           <div className="absolute inset-0">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  opacity: Math.random() * 0.8 + 0.2
-                }}
-              />
-            ))}
+            {Array.from({ length: 30 }).map((_, i) => {
+              // Use deterministic values based on index to avoid hydration mismatches
+              const left = ((i * 3.33) % 100) + (i % 3) * 0.5;
+              const top = ((i * 2.7) % 100) + (i % 5) * 0.3;
+              const animationDelay = (i * 0.1) % 2;
+              const opacity = 0.2 + ((i * 0.3) % 0.8);
+              
+              return (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                  style={{
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    animationDelay: `${animationDelay}s`,
+                    opacity: opacity
+                  }}
+                />
+              );
+            })}
           </div>
           
           <div className="w-8 h-12 bg-purple-400 relative animate-pulse" style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />

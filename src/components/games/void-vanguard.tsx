@@ -259,7 +259,7 @@ const spawnWave = (level: number): Enemy[] => {
             wave.push({
                 id: Date.now() + (row * cols + col),
                 x: horizontalGap * (col + 1) + col * enemyWidth,
-                y: -50 - (row * 60), // Start above screen, staggered
+                y: -100 - (row * 80), // Start further above screen, more staggered
                 width: enemyWidth,
                 height: enemyHeight,
                 type: 'standard',
@@ -324,7 +324,13 @@ const gameReducer = (state: GameState, action: Action): GameState => {
                                 const lastEnemy = nextState.enemies[nextState.enemies.length-1];
                                 enemyToSpawn.x = (lastEnemy.x + 70) % (GAME_WIDTH - 50);
                             }
-                            nextState.enemies = [...nextState.enemies, { ...enemyToSpawn, lastShot: now } ];
+                            // Only spawn enemy if it's not visible yet (above screen)
+                            if (enemyToSpawn.y < -enemyToSpawn.height) {
+                                nextState.enemies = [...nextState.enemies, { ...enemyToSpawn, lastShot: now } ];
+                            } else {
+                                // Put it back in the queue if it's still visible
+                                newQueue.unshift(enemyToSpawn);
+                            }
                         }
                     }
                     
@@ -370,8 +376,18 @@ const gameReducer = (state: GameState, action: Action): GameState => {
             }
 
             // --- Update Object Positions ---
-            nextState.playerBullets = nextState.playerBullets.map(b => b.active ? { ...b, y: b.y + b.vy * dt, x: b.x + b.vx * dt, active: b.y > -BULLET_HEIGHT } : b);
-nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { ...b, y: b.y + b.vy * dt, x: b.x + b.vx * dt, active: b.y < GAME_HEIGHT && b.y > -BULLET_HEIGHT && b.x > -BULLET_WIDTH && b.x < GAME_WIDTH } : b);
+            nextState.playerBullets = nextState.playerBullets.map(b => b.active ? { 
+                ...b, 
+                y: b.y + b.vy * dt, 
+                x: b.x + b.vx * dt, 
+                active: b.y > -BULLET_HEIGHT && b.y < GAME_HEIGHT && b.x > -BULLET_WIDTH && b.x < GAME_WIDTH 
+            } : b);
+            nextState.enemyBullets = nextState.enemyBullets.map(b => b.active ? { 
+                ...b, 
+                y: b.y + b.vy * dt, 
+                x: b.x + b.vx * dt, 
+                active: b.y < GAME_HEIGHT && b.y > -BULLET_HEIGHT && b.x > -BULLET_WIDTH && b.x < GAME_WIDTH 
+            } : b);
             nextState.powerUps = nextState.powerUps.map(p => ({ ...p, y: p.y + POWER_UP_SPEED * dt }));
             
             // --- Enemy Movement & Boss Logic ---
@@ -541,6 +557,11 @@ scoreGained += enemy.type === 'boss' ? 1000 : 50;
             // --- Cleanup & State Transitions ---
             nextState.enemies = nextState.enemies.filter(e => e.y < GAME_HEIGHT + 100); // Allow enemies to be visible longer
             nextState.powerUps = nextState.powerUps.filter(p => p.y < GAME_HEIGHT);
+
+            // Check for level completion when all enemies are destroyed
+            if (nextState.enemies.length === 0 && nextState.enemyQueue.length === 0 && !nextState.bossSpawned) {
+                nextState.status = nextState.level >= MAX_LEVELS ? 'YOU_WIN' : 'LEVEL_COMPLETE';
+            }
 
             if (nextState.lives <= 0) {
                 nextState.status = 'GAME_OVER';
