@@ -30,8 +30,14 @@ const AboutPage = () => {
               Fueled by nostalgia and a love for simple yet challenging gameplay, we custom-code each game to capture the spirit of the 8-bit era. At Retro Arcade Zone, pixel power meets endless play. So grab your virtual joystick, aim for the high score, and step back in time with us! 🕹️
             </p>
           </div>
-          <div className="mt-4 sm:mt-6 md:mt-8 text-center text-lg sm:text-xl md:text-2xl text-purple-400 animate-pulse">
-            --- PRESS START ---
+          <div className="mt-4 sm:mt-6 md:mt-8 text-center">
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="text-lg sm:text-xl md:text-2xl text-purple-400 hover:text-purple-300 animate-pulse cursor-pointer transition-colors duration-300 hover:scale-105 transform"
+              title="Go to all games"
+            >
+              --- PRESS START ---
+            </button>
           </div>
         </div>
       </main>

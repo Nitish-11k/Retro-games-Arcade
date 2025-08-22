@@ -301,6 +301,13 @@ const PixManGame = () => {
     }
   };
 
+  // Enhanced mobile input handling with touch and mouse support
+  const handleDirectionInput = (direction: { dx: number; dy: number }) => {
+    if (gameState === GameState.PLAYING && player.current) {
+      player.current.nextDirection = direction;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 p-4" style={{ fontFamily: "'Press Start 2P', monospace" }}>
       <header className="mb-6 text-center">
@@ -326,16 +333,70 @@ const PixManGame = () => {
               </div>
             </CardContent>
           </Card>
-          {isMobile && gameState === GameState.PLAYING && (
+          {/* Mobile Controls - Always visible on mobile */}
+          {isMobile && (
             <div className="mt-4 flex justify-center items-center">
-                <div className="grid grid-cols-3 gap-2">
-                    <div></div>
-                    <Button onTouchStart={() => handleMobileInput({ dx: 0, dy: -1 })} className="bg-gray-700 active:bg-yellow-500"><ArrowUp /></Button>
-                    <div></div>
-                    <Button onTouchStart={() => handleMobileInput({ dx: -1, dy: 0 })} className="bg-gray-700 active:bg-yellow-500"><ArrowLeft /></Button>
-                    <Button onTouchStart={() => handleMobileInput({ dx: 0, dy: 1 })} className="bg-gray-700 active:bg-yellow-500"><ArrowDown /></Button>
-                    <Button onTouchStart={() => handleMobileInput({ dx: 1, dy: 0 })} className="bg-gray-700 active:bg-yellow-500"><ArrowRight /></Button>
+              {gameState === GameState.START_SCREEN && (
+                <div className="mb-4">
+                  <Button 
+                    onClick={() => {
+                      resetGame();
+                      setGameState(GameState.GAME_START_ANIMATION);
+                      stateTimer.current = 2000;
+                    }}
+                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold px-8 py-4 text-lg transform hover:scale-105 transition-all duration-200 shadow-lg"
+                  >
+                    🎮 PRESS START TO PLAY
+                  </Button>
                 </div>
+              )}
+              
+              {gameState === GameState.GAME_OVER && (
+                <div className="mb-4">
+                  <Button 
+                    onClick={() => resetGame()}
+                    className="bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold px-8 py-4 text-lg transform hover:scale-105 transition-all duration-200 shadow-lg"
+                  >
+                    🔄 PLAY AGAIN
+                  </Button>
+                </div>
+              )}
+              
+              {/* Game Controls - Only show during gameplay */}
+              {gameState === GameState.PLAYING && (
+                <div className="grid grid-cols-3 gap-3">
+                  <div></div>
+                  <Button 
+                    onTouchStart={() => handleDirectionInput({ dx: 0, dy: -1 })}
+                    onMouseDown={() => handleDirectionInput({ dx: 0, dy: -1 })}
+                    className="bg-gray-700 hover:bg-yellow-500 active:bg-yellow-600 text-white p-4 rounded-full shadow-lg transform active:scale-95 transition-all duration-150"
+                  >
+                    <ArrowUp className="h-6 w-6" />
+                  </Button>
+                  <div></div>
+                  <Button 
+                    onTouchStart={() => handleDirectionInput({ dx: -1, dy: 0 })}
+                    onMouseDown={() => handleDirectionInput({ dx: -1, dy: 0 })}
+                    className="bg-gray-700 hover:bg-yellow-500 active:bg-yellow-600 text-white p-4 rounded-full shadow-lg transform active:scale-95 transition-all duration-150"
+                  >
+                    <ArrowLeft className="h-6 w-6" />
+                  </Button>
+                  <Button 
+                    onTouchStart={() => handleDirectionInput({ dx: 0, dy: 1 })}
+                    onMouseDown={() => handleDirectionInput({ dx: 0, dy: 1 })}
+                    className="bg-gray-700 hover:bg-yellow-500 active:bg-yellow-600 text-white p-4 rounded-full shadow-lg transform active:scale-95 transition-all duration-150"
+                  >
+                    <ArrowDown className="h-6 w-6" />
+                  </Button>
+                  <Button 
+                    onTouchStart={() => handleDirectionInput({ dx: 1, dy: 0 })}
+                    onMouseDown={() => handleDirectionInput({ dx: 1, dy: 0 })}
+                    className="bg-gray-700 hover:bg-yellow-500 active:bg-yellow-600 text-white p-4 rounded-full shadow-lg transform active:scale-95 transition-all duration-150"
+                  >
+                    <ArrowRight className="h-6 w-6" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -381,6 +442,12 @@ const PixManGame = () => {
                 <div className="text-lg font-bold text-white">ARROW KEYS</div>
                 <div className="text-xs text-blue-400/80">TO MOVE</div>
               </div>
+              {isMobile && (
+                <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
+                  <div className="text-lg font-bold text-white">TOUCH CONTROLS</div>
+                  <div className="text-xs text-blue-400/80">USE ON-SCREEN BUTTONS</div>
+                </div>
+              )}
               <div className="text-center p-2 bg-gray-900 border border-gray-700 rounded-md">
                 <div className="text-lg font-bold text-white">PELLETS LEFT</div>
                 <div className="text-xl text-green-400">{pellets.current}</div>

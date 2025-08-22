@@ -1,74 +1,58 @@
 'use client';
 
-import { useState } from 'react';
-import { Mail, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Mail, MapPin, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [submitMessage, setSubmitMessage] = useState('');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
-
-    try {
-      // Use our API route which will definitely work
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setSubmitMessage('Message sent successfully! We\'ll get back to you within 24 hours.');
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          subject: '',
-          message: ''
-        });
-      } else {
-        throw new Error('Failed to send message');
-      }
-    } catch (error) {
-      console.error('Contact form error:', error);
-      setSubmitStatus('error');
-      setSubmitMessage('Failed to send message. Please try again or email us directly.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      {/* Header Navigation */}
+      <header className="py-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <a href="/" className="text-2xl md:text-3xl font-headline tracking-tighter">
+            <span className="animate-pulse">🕹️</span>
+            <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
+              {' '}
+              Retro Arcade Zone
+            </span>
+          </a>
+          <div className="flex items-center space-x-4">
+            <nav className="flex items-center space-x-4 text-sm uppercase font-headline">
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="hover:text-primary transition-colors text-gray-300 hover:text-primary cursor-pointer"
+                title="Go to homepage games section"
+              >
+                All Games
+              </button>
+              <button 
+                onClick={() => window.location.href = '/#leaderboard'}
+                className="hover:text-primary transition-colors text-gray-300 hover:text-primary cursor-pointer"
+                title="Go to homepage leaderboard section"
+              >
+                Leaderboard
+              </button>
+              <a href="/contact" className="text-primary transition-colors">
+                Contact
+              </a>
+            </nav>
+            <div className="flex items-center gap-2">
+              <a 
+                href="mailto:retroarcade1410@gmail.com"
+                className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 text-white px-4 py-2 rounded-md transition-all duration-200 transform hover:scale-105 text-sm font-semibold uppercase"
+              >
+                📧 Email Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        {/* Header Section */}
         <div className="text-center mb-12 sm:mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-headline text-white mb-4 sm:mb-6">
-            Get in Touch
+            Contact Us
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
             Have questions, suggestions, or just want to say hello? We'd love to hear from you!
@@ -139,135 +123,52 @@ export default function ContactPage() {
             </Card>
           </div>
 
-          {/* Contact Form */}
-          <Card className="bg-gray-800/50 border-gray-700 text-white">
-            <CardHeader>
-              <CardTitle className="text-xl sm:text-2xl text-purple-400">Send us a Message</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
-                      placeholder="Your first name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
-                      placeholder="Your last name"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
-                    Subject
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+          {/* How to Contact Us */}
+          <div className="space-y-4 sm:space-y-6">
+            <Card className="bg-gray-800/50 border-gray-700 text-white">
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-purple-400">How to Reach Us</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
+                  <p className="text-gray-300 mb-4 text-sm sm:text-base">
+                    The best way to get in touch with us is through email. We'll respond to all inquiries within 24 hours.
+                  </p>
+                  <a
+                    href="mailto:retroarcade1410@gmail.com"
+                    className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-md transition-all duration-200 transform hover:scale-105 text-base"
                   >
-                    <option value="">Select a subject</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="support">Technical Support</option>
-                    <option value="feedback">Game Feedback</option>
-                    <option value="partnership">Partnership</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <Mail className="h-5 w-5" />
+                    <span>Send us an Email</span>
+                  </a>
                 </div>
+              </CardContent>
+            </Card>
 
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
-                    placeholder="Tell us what's on your mind..."
-                  ></textarea>
+            <Card className="bg-gray-800/50 border-gray-700 text-white">
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl text-purple-400">Response Guidelines</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 sm:space-y-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-300 text-sm sm:text-base">General inquiries: Within 24 hours</span>
                 </div>
-
-                {/* Submit Status Message */}
-                {submitStatus !== 'idle' && (
-                  <div className={`p-3 rounded-md flex items-center space-x-2 ${
-                    submitStatus === 'success' 
-                      ? 'bg-green-500/20 border border-green-500/50 text-green-400' 
-                      : 'bg-red-500/20 border border-red-500/50 text-red-400'
-                  }`}>
-                    {submitStatus === 'success' ? (
-                      <CheckCircle className="h-4 w-4" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4" />
-                    )}
-                    <span className="text-sm">{submitMessage}</span>
-                  </div>
-                )}
-
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-md transition-all duration-200 transform hover:scale-105 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-300 text-sm sm:text-base">Technical support: Within 24 hours</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-300 text-sm sm:text-base">Partnership requests: 2-3 business days</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-300 text-sm sm:text-base">Urgent issues: Marked as "URGENT" in subject</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Direct Email Section */}
@@ -275,10 +176,10 @@ export default function ContactPage() {
           <Card className="bg-gray-800/50 border-gray-700 text-white max-w-2xl mx-auto">
             <CardContent className="py-6 sm:py-8">
               <h3 className="text-xl sm:text-2xl font-headline text-purple-400 mb-3 sm:mb-4">
-                Prefer to Email Directly?
+                Ready to Get Started?
               </h3>
               <p className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
-                You can also reach us directly at our Gmail address
+                Click the button below to open your email client and send us a message
               </p>
               <a
                 href="mailto:retroarcade1410@gmail.com"

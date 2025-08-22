@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Press_Start_2P, Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/use-auth';
+import { EmailJSProvider } from '@/components/emailjs-provider';
 import './globals.css';
 
 const pressStart2P = Press_Start_2P({
@@ -168,9 +169,11 @@ export default function RootLayout({
         {/* Preload hero font weight if needed (kept minimal) */}
       </head>
       <body className="font-sans antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <EmailJSProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </EmailJSProvider>
         <Toaster />
       </body>
     </html>
