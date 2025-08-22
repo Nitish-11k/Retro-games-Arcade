@@ -179,13 +179,15 @@ type GameState = {
     bossSpawned: boolean;
     enemyQueue: Enemy[];
     enemySpawnTimer: number;
+    isPaused: boolean;
 };
 
 type Action =
     | { type: 'START_GAME' }
     | { type: 'NEXT_LEVEL' }
     | { type: 'GAME_TICK'; payload: { dt: number; keys: Set<string>; quadtree: Quadtree; } }
-    | { type: 'RESET_GAME' };
+    | { type: 'RESET_GAME' }
+    | { type: 'TOGGLE_PAUSE' };
 
 const GameContext = createContext<{ state: GameState; dispatch: React.Dispatch<Action> } | null>(null);
 
@@ -243,6 +245,7 @@ const createInitialState = (): GameState => ({
     bossSpawned: false,
     enemyQueue: [],
     enemySpawnTimer: ENEMY_SPAWN_RATE, // Initialize with spawn rate so enemies spawn immediately
+    isPaused: false,
 });
 
 const spawnWave = (level: number): Enemy[] => {
@@ -259,7 +262,7 @@ const spawnWave = (level: number): Enemy[] => {
             wave.push({
                 id: Date.now() + (row * cols + col),
                 x: horizontalGap * (col + 1) + col * enemyWidth,
-                y: -100 - (row * 80), // Start further above screen, more staggered
+                y: -200 - (row * 100), // Start much further above screen to prevent visibility
                 width: enemyWidth,
                 height: enemyHeight,
                 type: 'standard',
@@ -295,8 +298,13 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         }
         case 'RESET_GAME':
             return createInitialState();
+        case 'TOGGLE_PAUSE':
+            if (state.status === 'PLAYING') {
+                return { ...state, isPaused: !state.isPaused };
+            }
+            return state;
         case 'GAME_TICK': {
-            if (state.status !== 'PLAYING') return state;
+            if (state.status !== 'PLAYING' || state.isPaused) return state;
             
             const { dt, keys, quadtree } = action.payload;
             const now = performance.now();
@@ -324,8 +332,8 @@ const gameReducer = (state: GameState, action: Action): GameState => {
                                 const lastEnemy = nextState.enemies[nextState.enemies.length-1];
                                 enemyToSpawn.x = (lastEnemy.x + 70) % (GAME_WIDTH - 50);
                             }
-                            // Only spawn enemy if it's not visible yet (above screen)
-                            if (enemyToSpawn.y < -enemyToSpawn.height) {
+                            // Only spawn enemy if it's completely off-screen (above screen with buffer)
+                            if (enemyToSpawn.y < -enemyToSpawn.height - 50) {
                                 nextState.enemies = [...nextState.enemies, { ...enemyToSpawn, lastShot: now } ];
                             } else {
                                 // Put it back in the queue if it's still visible
@@ -583,7 +591,7 @@ scoreGained += enemy.type === 'boss' ? 1000 : 50;
                 nextState.enemies.push({
                     id: Date.now() - 1, 
                     x: GAME_WIDTH / 2 - bossSize / 2, 
-                    y: -100,
+                    y: -200, // Start further above screen to prevent visibility
                     width: bossSize, 
                     height: bossSize / 2, 
                     type: 'boss',
@@ -774,6 +782,18 @@ const GameCanvas: React.FC = () => {
     const [mobileMove, setMobileMove] = useState<'left' | 'right' | null>(null);
     const [mobileShoot, setMobileShoot] = useState(false);
 
+    // Handle pause key from keyboard
+    useEffect(() => {
+        const handlePauseKey = () => {
+            if (state.status === 'PLAYING') {
+                dispatch({ type: 'TOGGLE_PAUSE' });
+            }
+        };
+        
+        window.addEventListener('togglePause', handlePauseKey);
+        return () => window.removeEventListener('togglePause', handlePauseKey);
+    }, [dispatch, state.status]);
+
     // Add mobile controls to the keys pressed
     useEffect(() => {
         if (mobileMove === 'left') {
@@ -795,13 +815,13 @@ const GameCanvas: React.FC = () => {
 
     useGameLoop(useCallback((dt: number) => {
         dispatch({ type: 'GAME_TICK', payload: { dt, keys: keysPressed.current, quadtree } });
-    }, [dispatch, quadtree, keysPressed]), state.status === 'PLAYING');
+    }, [dispatch, quadtree, keysPressed]), state.status === 'PLAYING' && !state.isPaused);
 
     return (
         <div className="relative w-full" style={{ aspectRatio: `${GAME_WIDTH}/${GAME_HEIGHT}`, minHeight: '500px', maxHeight: '70vh' }}>
             <svg viewBox={`0 0 ${GAME_WIDTH} ${GAME_HEIGHT}`} className="w-full h-full bg-gray-900 border-4 border-yellow-300" preserveAspectRatio="xMidYMid meet">
                 <rect width={GAME_WIDTH} height={GAME_HEIGHT} fill={COLORS.BACKGROUND} />
-                {(state.status === 'PLAYING' || state.status === 'GAME_OVER' || state.status === 'LEVEL_COMPLETE' || state.status === 'YOU_WIN') && (
+                {(state.status === 'PLAYING' || state.status === 'GAME_OVER' || state.status === 'LEVEL_COMPLETE' || state.status === 'YOU_WIN') && !state.isPaused && (
                     <>
                         <PlayerShip player={state.player} />
                         {state.playerBullets.filter(b => b.active).map(b => <BulletComponent key={`p-${b.id}`} bullet={b} color={COLORS.PLAYER_BULLET} />)}
@@ -820,9 +840,21 @@ const GameCanvas: React.FC = () => {
             {state.status === 'GAME_OVER' && <GameOverScreen score={state.score} onRestart={() => dispatch({ type: 'RESET_GAME' })} />}
             {state.status === 'LEVEL_COMPLETE' && <LevelCompleteScreen level={state.level} onNext={() => dispatch({ type: 'NEXT_LEVEL' })} />}
             {state.status === 'YOU_WIN' && <YouWinScreen onRestart={() => dispatch({ type: 'RESET_GAME' })} />}
+            {state.isPaused && state.status === 'PLAYING' && (
+                <div className="absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-center z-10">
+                    <h2 className="text-4xl text-blue-300 mb-4">PAUSED</h2>
+                    <p className="text-gray-300 mb-4">Game is paused</p>
+                    <Button 
+                        onClick={() => dispatch({ type: 'TOGGLE_PAUSE' })} 
+                        className="bg-blue-400 hover:bg-blue-500 text-white"
+                    >
+                        RESUME
+                    </Button>
+                </div>
+            )}
             
             {/* Mobile Controls */}
-            {isMobile && state.status === 'PLAYING' && (
+            {isMobile && state.status === 'PLAYING' && !state.isPaused && (
                 <div className="absolute bottom-4 left-0 right-0 flex justify-between px-4">
                     {/* Movement Controls */}
                     <div className="flex gap-2">
@@ -866,6 +898,44 @@ const GameCanvas: React.FC = () => {
                     >
                         <span className="drop-shadow-sm text-sm">FIRE</span>
                     </Button>
+                    
+                    {/* Space Button for Mobile */}
+                    <Button
+                        onClick={() => {
+                            if (state.status === 'START_SCREEN') {
+                                dispatch({ type: 'START_GAME' });
+                            } else if (state.status === 'GAME_OVER') {
+                                dispatch({ type: 'RESET_GAME' });
+                            } else if (state.status === 'LEVEL_COMPLETE') {
+                                dispatch({ type: 'NEXT_LEVEL' });
+                            } else if (state.status === 'YOU_WIN') {
+                                dispatch({ type: 'RESET_GAME' });
+                            }
+                        }}
+                        className="select-none bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 active:from-yellow-600 active:to-yellow-700 text-black font-bold w-20 h-16 border-2 border-yellow-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                        style={{ 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                        }}
+                    >
+                        <span className="drop-shadow-sm text-sm">SPACE</span>
+                    </Button>
+                    
+                    {/* Pause Button for Mobile */}
+                    <Button
+                        onClick={() => {
+                            if (state.status === 'PLAYING') {
+                                dispatch({ type: 'TOGGLE_PAUSE' });
+                            }
+                        }}
+                        className="select-none bg-gradient-to-b from-blue-400 to-blue-600 hover:from-blue-300 hover:to-blue-500 active:from-blue-600 active:to-blue-700 text-white font-bold w-20 h-16 border-2 border-blue-200 shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center"
+                        style={{ 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                        }}
+                    >
+                        <span className="drop-shadow-sm text-sm">{state.isPaused ? 'RESUME' : 'PAUSE'}</span>
+                    </Button>
                 </div>
             )}
         </div>
@@ -881,6 +951,14 @@ const useKeyboardInput = () => {
             const key = e.key.toLowerCase();
             if (key === ' ' || key.startsWith('arrow')) e.preventDefault();
             keysPressed.current.add(key);
+            
+            // Handle pause with P key
+            if (key === 'p') {
+                e.preventDefault();
+                // Dispatch pause action through context
+                const event = new CustomEvent('togglePause');
+                window.dispatchEvent(event);
+            }
         };
         const handleKeyUp = (e: KeyboardEvent) => keysPressed.current.delete(e.key.toLowerCase());
 

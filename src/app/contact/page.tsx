@@ -9,7 +9,7 @@ export default function ContactPage() {
       {/* Header Navigation */}
       <header className="py-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <a href="/" className="text-2xl md:text-3xl font-bold tracking-tighter">
+          <a href="/" className="text-2xl md:text-3xl font-headline tracking-tighter">
             <span className="animate-pulse">🕹️</span>
             <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
               {' '}
@@ -17,7 +17,7 @@ export default function ContactPage() {
             </span>
           </a>
           <div className="flex items-center space-x-4">
-            <nav className="flex items-center space-x-4 text-sm uppercase font-bold">
+            <nav className="flex items-center space-x-4 text-sm uppercase font-headline">
               <button 
                 onClick={() => window.location.href = '/'}
                 className="hover:text-primary transition-colors text-gray-300 hover:text-primary cursor-pointer"
@@ -51,7 +51,7 @@ export default function ContactPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header Section */}
         <div className="text-center mb-12 sm:mb-16">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-headline text-white mb-4 sm:mb-6">
             Contact Us
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">

@@ -20,6 +20,7 @@ import {
   drawGhostPiece,
   getHighScore,
   setHighScore,
+  tetrominoes,
   type Position,
   type Tetromino,
   type GameStats
@@ -293,6 +294,16 @@ export default function PixelBoxGame() {
       })
     )
     
+    // If it's not the current piece, it's a placed piece - use the color from the grid
+    if (!isCurrentPiece && cell > 0) {
+      // Find the color based on the piece identifier in the grid
+      const pieceIndex = cell - 1
+      if (pieceIndex >= 0 && pieceIndex < tetrominoes.length) {
+        return tetrominoes[pieceIndex].color
+      }
+      return '#4ade80' // Fallback color for placed pieces
+    }
+    
     return isCurrentPiece ? currentPiece.color : '#4ade80' // Current piece or placed piece
   }
 
@@ -361,9 +372,15 @@ export default function PixelBoxGame() {
                   )}
                 </div>
 
-                {/* Mobile Controls */}
-                {isMobile && (
-                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3">
+                {/* Mobile Controls - Always rendered but hidden on desktop with CSS */}
+                <div className="mt-4 sm:mt-6 space-y-3 md:hidden lg:hidden xl:hidden 2xl:hidden">
+                  {/* Debug info - remove this after testing */}
+                  <div className="text-center text-xs text-gray-400 mb-2">
+                    Mobile controls visible | Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'N/A'}
+                  </div>
+                  
+                  {/* Movement and Rotation Row */}
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
                     <Button 
                       onClick={() => movePiece('left')}
                       className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3"
@@ -393,41 +410,63 @@ export default function PixelBoxGame() {
                       ↓ DROP
                     </Button>
                   </div>
-                )}
-
-                {/* Desktop Controls */}
-                {!isMobile && (
-                  <div className="mt-6 grid grid-cols-4 gap-3">
+                  
+                  {/* Space Button Row */}
+                  <div className="flex justify-center">
                     <Button 
-                      onClick={() => movePiece('left')}
-                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
-                      disabled={gameOver || !gameStarted}
+                      onClick={() => {
+                        if (gameOver) {
+                          resetGame()
+                        } else if (!gameStarted) {
+                          setGameStarted(true)
+                        } else {
+                          hardDrop()
+                        }
+                      }}
+                      className="bg-yellow-700 hover:bg-yellow-600 text-yellow-100 border border-yellow-400 text-xs sm:text-sm py-3 px-8 w-full max-w-xs"
+                      disabled={isPaused}
                     >
-                      ← LEFT
-                    </Button>
-                    <Button 
-                      onClick={() => movePiece('right')}
-                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
-                      disabled={gameOver || !gameStarted}
-                    >
-                      RIGHT →
-                    </Button>
-                    <Button 
-                      onClick={() => rotatePiece()}
-                      className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm py-3"
-                      disabled={gameOver || !gameStarted}
-                    >
-                      ↻ ROTATE
-                    </Button>
-                    <Button 
-                      onClick={() => hardDrop()}
-                      className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm py-3"
-                      disabled={gameOver || !gameStarted}
-                    >
-                      ↓ DROP
+                      {gameOver ? 'RESTART' : !gameStarted ? 'START' : 'SPACE'}
                     </Button>
                   </div>
-                )}
+                </div>
+
+                {/* Desktop Controls - Always rendered but hidden on mobile with CSS */}
+                <div className="mt-6 grid grid-cols-4 gap-3 hidden md:grid lg:grid xl:grid 2xl:grid">
+                  {/* Debug info - remove this after testing */}
+                  <div className="text-center text-xs text-gray-400 mb-2 col-span-4">
+                    Desktop controls visible | Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'N/A'}
+                  </div>
+                  
+                  <Button 
+                    onClick={() => movePiece('left')}
+                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                    disabled={gameOver || !gameStarted}
+                  >
+                    ← LEFT
+                  </Button>
+                  <Button 
+                    onClick={() => movePiece('right')}
+                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                    disabled={gameOver || !gameStarted}
+                  >
+                    RIGHT →
+                  </Button>
+                  <Button 
+                    onClick={() => rotatePiece()}
+                    className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm py-3"
+                    disabled={gameOver || !gameStarted}
+                  >
+                    ↻ ROTATE
+                  </Button>
+                  <Button 
+                    onClick={() => hardDrop()}
+                    className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm py-3"
+                    disabled={gameOver || !gameStarted}
+                  >
+                    ↓ DROP
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -4,19 +4,25 @@
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { AuthModal } from '@/components/auth/auth-modal';
-import { UserCircle, LogOut, Menu } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { UserCircle, LogOut } from 'lucide-react';
 import { useSmoothScroll } from '@/hooks/use-smooth-scroll';
 import { useRouter, usePathname } from 'next/navigation';
+import { lazy, Suspense } from 'react';
+
+// Lazy load auth components to improve header performance
+const AuthModal = lazy(() => import('@/components/auth/auth-modal').then(mod => ({ default: mod.AuthModal })));
 
 const Header = () => {
   const { user, loading, logout } = useAuth();
-  const isMobile = useIsMobile();
   const { scrollToSection } = useSmoothScroll();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Preload auth components when user hovers over auth area
+  const preloadAuth = () => {
+    // This will trigger the lazy loading in the background
+    import('@/components/auth/auth-modal');
+  };
 
   const handleNavigation = (section: string) => {
     if (pathname === '/') {
@@ -78,71 +84,42 @@ const Header = () => {
             Retro Arcade Zone
           </span>
         </Link>
-        {isMobile ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-gray-900 text-white">
-              <nav className="flex flex-col items-center space-y-6 text-lg uppercase font-headline mt-10">
-                {navLinks}
-              </nav>
-              <div className="flex flex-col items-center gap-4 mt-10">
-                {!loading && user ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                       <UserCircle className="h-6 w-6" />
-                       <span className="text-lg">{user.displayName || user.email}</span>
-                    </div>
-                    <Button variant="ghost" onClick={logout} className="w-full">
-                      <LogOut className="h-5 w-5 mr-2" />
-                      Logout
-                    </Button>
-                  </>
-                ) : !loading ? (
+        <div className="flex items-center space-x-4">
+          <nav className="flex items-center space-x-4 text-sm uppercase font-headline">
+            {navLinks}
+          </nav>
+          <div className="flex items-center gap-2">
+            {!loading && user ? (
+              <>
+                <div className="flex items-center gap-2">
+                   <UserCircle className="h-5 w-5" />
+                   <span className="text-sm hidden sm:inline">{user.displayName || user.email}</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={logout}>
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </>
+            ) : !loading ? (
+              <div onMouseEnter={preloadAuth}>
+                <Suspense fallback={
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" className="text-sm uppercase" disabled>Log In</Button>
+                    <Button variant="secondary" className="text-sm uppercase" disabled>Sign Up</Button>
+                  </div>
+                }>
                   <>
                     <AuthModal mode="login">
-                      <Button variant="ghost" className="w-full text-lg uppercase">Log In</Button>
+                      <Button variant="ghost" className="text-sm uppercase">Log In</Button>
                     </AuthModal>
                     <AuthModal mode="signup">
-                      <Button variant="secondary" className="w-full text-lg uppercase">Sign Up</Button>
+                      <Button variant="secondary" className="text-sm uppercase">Sign Up</Button>
                     </AuthModal>
                   </>
-                ) : null}
+                </Suspense>
               </div>
-            </SheetContent>
-          </Sheet>
-        ) : (
-          <div className="flex items-center space-x-4">
-            <nav className="flex items-center space-x-4 text-sm uppercase font-headline">
-              {navLinks}
-            </nav>
-            <div className="flex items-center gap-2">
-              {!loading && user ? (
-                <>
-                  <div className="flex items-center gap-2">
-                     <UserCircle className="h-5 w-5" />
-                     <span className="text-sm hidden sm:inline">{user.displayName || user.email}</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={logout}>
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </>
-              ) : !loading ? (
-                <>
-                  <AuthModal mode="login">
-                    <Button variant="ghost" className="text-sm uppercase">Log In</Button>
-                  </AuthModal>
-                  <AuthModal mode="signup">
-                    <Button variant="secondary" className="text-sm uppercase">Sign Up</Button>
-                  </AuthModal>
-                </>
-              ) : null}
-            </div>
+            ) : null}
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

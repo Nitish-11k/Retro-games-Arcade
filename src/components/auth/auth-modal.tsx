@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,9 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { AuthForm } from './auth-form';
+
+// Lazy load AuthForm to improve modal performance
+const AuthForm = lazy(() => import('./auth-form').then(mod => ({ default: mod.AuthForm })));
 
 interface AuthModalProps {
   children: React.ReactNode;
@@ -34,7 +36,13 @@ export function AuthModal({ children, mode }: AuthModalProps) {
               : 'Sign up to join the leaderboards!'}
           </DialogDescription>
         </DialogHeader>
-        <AuthForm mode={mode} onAuthSuccess={() => setOpen(false)} />
+        <Suspense fallback={
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        }>
+          <AuthForm mode={mode} onAuthSuccess={() => setOpen(false)} />
+        </Suspense>
       </DialogContent>
     </Dialog>
   );
