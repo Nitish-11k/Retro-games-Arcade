@@ -6,48 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      {/* Header Navigation */}
-      <header className="py-6 sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <a href="/" className="text-2xl md:text-3xl font-headline tracking-tighter">
-            <span className="animate-pulse">🕹️</span>
-            <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
-              {' '}
-              Retro Arcade Zone
-            </span>
-          </a>
-          <div className="flex items-center space-x-4">
-            <nav className="flex items-center space-x-4 text-sm uppercase font-headline">
-              <button 
-                onClick={() => window.location.href = '/'}
-                className="hover:text-primary transition-colors text-gray-300 hover:text-primary cursor-pointer"
-                title="Go to homepage games section"
-              >
-                All Games
-              </button>
-              <button 
-                onClick={() => window.location.href = '/#leaderboard'}
-                className="hover:text-primary transition-colors text-gray-300 hover:text-primary cursor-pointer"
-                title="Go to homepage leaderboard section"
-              >
-                Leaderboard
-              </button>
-              <a href="/contact" className="text-primary transition-colors">
-                Contact
-              </a>
-            </nav>
-            <div className="flex items-center gap-2">
-              <a 
-                href="mailto:retroarcade1410@gmail.com"
-                className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 text-white px-4 py-2 rounded-md transition-all duration-200 transform hover:scale-105 text-sm font-semibold uppercase"
-              >
-                📧 Email Us
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header Section */}
         <div className="text-center mb-12 sm:mb-16">
@@ -73,7 +31,7 @@ export default function ContactPage() {
                     <p className="font-semibold text-sm sm:text-base">Email</p>
                     <a 
                       href="mailto:retroarcade1410@gmail.com" 
-                      className="text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base"
+                      className="text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base break-words"
                     >
                       retroarcade1410@gmail.com
                     </a>

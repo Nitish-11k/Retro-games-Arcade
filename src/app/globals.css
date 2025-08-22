@@ -62,10 +62,31 @@
   }
   html {
     scroll-behavior: smooth;
+    /* Performance optimizations */
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    /* Performance optimizations */
+    line-height: 1.6;
+    text-rendering: optimizeSpeed;
+  }
+  
+  /* Optimize font loading */
+  .font-headline {
+    font-display: swap;
+    font-feature-settings: "liga" 1, "kern" 1;
+  }
+  
+  /* Optimize images */
+  img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
   }
 }
 
@@ -78,4 +99,26 @@
 
 .retro-shadow {
   box-shadow: 4px 4px 0px rgba(255, 102, 0, 0.5);
+}
+
+/* Performance optimizations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-opacity {
+    will-change: opacity;
+  }
+  
+  /* Optimize animations for mobile */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

@@ -6,6 +6,7 @@ export interface Position {
 export interface Tetromino {
   shape: number[][];
   color: string;
+  name: string;
 }
 
 export interface GameStats {
@@ -125,8 +126,6 @@ export const placePiece = (
   color: string
 ): number[][] => {
   const newGrid = grid.map(row => [...row]);
-  const colorIndex = tetrominoes.findIndex(t => t.color === color);
-  const pieceIdentifier = colorIndex !== -1 ? colorIndex + 1 : 1;
 
   shape.forEach((row, y) => {
     row.forEach((cell, x) => {
@@ -134,7 +133,9 @@ export const placePiece = (
         const newY = position.row + y;
         const newX = position.col + x;
         if (newY >= 0 && newY < ROWS && newX >= 0 && newX < COLS) {
-          newGrid[newY][newX] = pieceIdentifier;
+          // Store the color directly as a string identifier
+          // We'll use a special format: 'color_' + color to distinguish from piece identifiers
+          newGrid[newY][newX] = color as any; // Store color directly
         }
       }
     });

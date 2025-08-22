@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Header from '@/components/layout/header';
 
 export const metadata: Metadata = {
   title: 'Contact Us - Retro Arcade Zone',
@@ -20,5 +21,10 @@ export default function ContactLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  );
 }

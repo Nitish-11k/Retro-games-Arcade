@@ -3,6 +3,7 @@ import { Press_Start_2P, Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/use-auth';
 import { EmailJSProvider } from '@/components/emailjs-provider';
+import { PerformanceMonitor } from '@/components/performance-monitor';
 import './globals.css';
 
 const pressStart2P = Press_Start_2P({
@@ -10,11 +11,16 @@ const pressStart2P = Press_Start_2P({
   weight: '400',
   display: 'swap',
   variable: '--font-press-start-2p',
+  preload: true,
+  fallback: ['monospace'],
 });
 
 const fontSans = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
@@ -23,58 +29,10 @@ export const metadata: Metadata = {
     default: 'Retro Arcade Zone',
     template: '%s | Retro Arcade Zone',
   },
-  description: 'Step back in time with Retro Arcade Zone! Play the best free retro browser games instantly. Enjoy classics like Tetris, Pac-Man, and Snake right in your browser—no downloads required.',
+  description: 'Play free retro browser games instantly. Enjoy classics like Tetris, Pac-Man, and Snake right in your browser—no downloads required.',
   keywords: [
-    // Core & General
-    'retro games',
-    'arcade games',
-    'classic arcade games',
-    'old school games',
-    'pixel games',
-    '8-bit games',
-    '90s games',
-    'vintage games',
-    'retro arcade games',
-    'retro arcade zone',
-
-    // Action & Intent
-    'play online games',
-    'free games',
-    'browser games',
-    'online games no download',
-    'free online games',
-    'games to play online',
-    'instant play games',
-
-    // Specific Games
-    'tetris',
-    'tetris online',
-    'play tetris free',
-    'pac-man',
-    'pac-man online',
-    'play pac-man free',
-    'flappy bird',
-    'flappy bird online',
-    'play flappy bird free',
-    'snake',
-    'snake game',
-    'play snake game',
-    'mario',
-    'mario runner',
-    'platformer games',
-    'pong',
-    'pixel paddle',
-    'space invaders',
-    'void vanguard',
-    'slither.io',
-    'pixel slither',
-
-    // Broader Arcade Terms
-    'retro arcade',
-    'retro arcade games',
-    'retro arcade games online',
-    'retro arcade games free',
-    'online arcade',
+    'retro games', 'arcade games', 'classic games', 'free games', 'browser games',
+    'tetris', 'pac-man', 'flappy bird', 'snake', 'online games'
   ],
   alternates: {
     canonical: '/',
@@ -83,7 +41,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://retroarcade.in',
     title: 'Retro Arcade Zone',
-    description: 'Pixel Power Meets Endless Play · Play free retro browser games instantly.',
+    description: 'Play free retro browser games instantly.',
     siteName: 'Retro Arcade Zone',
     locale: 'en_US',
   },
@@ -104,7 +62,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico', // Next.js will automatically look for this in the /public directory
+    icon: '/favicon.ico',
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
@@ -125,26 +83,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${pressStart2P.variable} ${fontSans.variable} dark scroll-smooth`}>
       <head>
-        {/* The <link> tags for Google Fonts are no longer needed and will be removed. */}
-        {/* Structured Data: Organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Retro Arcade Zone',
-              url: 'https://retroarcade.in',
-              logo: 'https://retroarcade.in/favicon.ico',
-              sameAs: [
-                "https://twitter.com/YourTwitterHandle",
-                "https://www.facebook.com/YourFacebookPage",
-                "https://www.instagram.com/YourInstagramProfile",
-                "https://www.youtube.com/YourYouTubeChannel"
-              ],
-            }),
-          }}
-        />
+        {/* Preload critical resources */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Structured Data: Organization - Simplified */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -153,20 +96,17 @@ export default function RootLayout({
               '@type': 'WebSite',
               name: 'Retro Arcade Zone',
               url: 'https://retroarcade.in',
-              potentialAction: {
-                '@type': 'SearchAction',
-                target: 'https://retroarcade.in/?q={search_term_string}',
-                'query-input': 'required name=search_term_string',
-              },
+              description: 'Play free retro browser games instantly',
             }),
           }}
         />
-         <script
-           async
-           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7695636367145795"
-           crossOrigin="anonymous"
-         ></script>
-        {/* Preload hero font weight if needed (kept minimal) */}
+        
+        {/* Google AdSense - Load asynchronously */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7695636367145795"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="font-sans antialiased">
         <EmailJSProvider>
@@ -175,6 +115,7 @@ export default function RootLayout({
           </AuthProvider>
         </EmailJSProvider>
         <Toaster />
+        <PerformanceMonitor />
       </body>
     </html>
   );

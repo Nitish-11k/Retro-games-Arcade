@@ -280,7 +280,7 @@ export default function PixelBoxGame() {
     return displayGrid
   }
 
-  const getCellColor = (cell: number, rowIndex: number, colIndex: number) => {
+  const getCellColor = (cell: number | string, rowIndex: number, colIndex: number) => {
     if (cell === 0) return '#0a0a0a' // Empty cell
     if (cell === 2) return 'rgba(255, 255, 255, 0.2)' // Ghost piece
     
@@ -294,38 +294,53 @@ export default function PixelBoxGame() {
       })
     )
     
-    // If it's not the current piece, it's a placed piece - use the color from the grid
-    if (!isCurrentPiece && cell > 0) {
-      // Find the color based on the piece identifier in the grid
-      const pieceIndex = cell - 1
-      if (pieceIndex >= 0 && pieceIndex < tetrominoes.length) {
-        return tetrominoes[pieceIndex].color
-      }
-      return '#4ade80' // Fallback color for placed pieces
+    // If it's the current piece, use its color
+    if (isCurrentPiece) {
+      return currentPiece.color
     }
     
-    return isCurrentPiece ? currentPiece.color : '#4ade80' // Current piece or placed piece
+    // If it's a placed piece, the cell contains the color directly
+    if (typeof cell === 'string' && cell.startsWith('#')) {
+      return cell // Return the color directly
+    }
+    
+    // Fallback for any other cases
+    return '#4ade80'
   }
 
   const displayGrid = createDisplayGrid()
 
+  // Calculate responsive cell sizes
+  const getCellSize = () => {
+    if (isMobile) {
+      // For mobile, calculate size based on screen width
+      const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 375
+      const availableWidth = Math.min(screenWidth - 32, 300) // Account for padding and margins
+      return Math.floor(availableWidth / COLS)
+    }
+    return 32 // Desktop default
+  }
+
+  const cellSize = getCellSize()
+
   return (
-    <div className="min-h-screen bg-black text-green-400 p-2 sm:p-4" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+    <div className="min-h-screen bg-black text-green-400 p-2 sm:p-4 md:p-6" style={{ fontFamily: '"Press Start 2P", monospace' }}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-3 flex justify-center">
-            <Card className="bg-gray-900 border-green-400 border-2 w-full">
+            <Card className="bg-gray-900 border-green-400 border-2 w-full max-w-2xl xl:max-w-3xl">
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-green-400 text-lg sm:text-xl lg:text-2xl">PIXEL BOX</CardTitle>
+                <CardTitle className="text-green-400 text-base sm:text-lg md:text-xl lg:text-2xl break-words">PIXEL BOX</CardTitle>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6">
-                <div className="relative flex justify-center">
+              <CardContent className="p-2 sm:p-4 md:p-6 lg:p-8">
+                <div className="relative flex justify-center overflow-hidden">
                   <div 
-                    className="inline-block border-4 border-green-400 bg-black p-2 sm:p-3"
+                    className="inline-block border-4 border-green-400 bg-black p-1 sm:p-2 lg:p-3"
                     style={{ 
                       boxShadow: '0 0 30px #4ade80',
                       filter: 'drop-shadow(0 0 15px #4ade80)',
-                      maxWidth: isMobile ? '100%' : 'auto'
+                      maxWidth: '100%',
+                      overflow: 'hidden'
                     }}
                   >
                     {displayGrid.map((row, rowIndex) => (
@@ -335,8 +350,8 @@ export default function PixelBoxGame() {
                             key={colIndex}
                             className="border border-gray-700"
                             style={{
-                              width: isMobile ? 24 : 32,
-                              height: isMobile ? 24 : 32,
+                              width: cellSize,
+                              height: cellSize,
                               backgroundColor: getCellColor(cell, rowIndex, colIndex),
                               boxShadow: cell === 1 ? 'inset 0 0 5px rgba(255,255,255,0.3)' : 'none'
                             }}
@@ -348,23 +363,23 @@ export default function PixelBoxGame() {
 
                   {(gameOver || isPaused || !gameStarted) && (
                     <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
-                      <div className="text-center">
+                      <div className="text-center p-2">
                         {gameOver && (
                           <>
-                            <div className="text-red-400 text-lg sm:text-xl mb-2">GAME OVER</div>
-                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS SPACE TO RESTART</div>
+                            <div className="text-red-400 text-base sm:text-lg mb-2 break-words">GAME OVER</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4 break-words">PRESS SPACE TO RESTART</div>
                           </>
                         )}
                         {isPaused && !gameOver && (
                           <>
-                            <div className="text-yellow-400 text-lg sm:text-xl mb-2">PAUSED</div>
-                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS P TO CONTINUE</div>
+                            <div className="text-yellow-400 text-base sm:text-lg mb-2 break-words">PAUSED</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4 break-words">PRESS P TO CONTINUE</div>
                           </>
                         )}
                         {!gameStarted && !gameOver && (
                           <>
-                            <div className="text-green-400 text-lg sm:text-xl mb-2">PIXEL BOX</div>
-                            <div className="text-green-400 text-xs sm:text-sm mb-4">PRESS SPACE TO START</div>
+                            <div className="text-green-400 text-base sm:text-lg mb-2 break-words">PIXEL BOX</div>
+                            <div className="text-green-400 text-xs sm:text-sm mb-4 break-words">PRESS SPACE TO START</div>
                           </>
                         )}
                       </div>
@@ -372,46 +387,41 @@ export default function PixelBoxGame() {
                   )}
                 </div>
 
-                {/* Mobile Controls - Always rendered but hidden on desktop with CSS */}
-                <div className="mt-4 sm:mt-6 space-y-3 md:hidden lg:hidden xl:hidden 2xl:hidden">
-                  {/* Debug info - remove this after testing */}
-                  <div className="text-center text-xs text-gray-400 mb-2">
-                    Mobile controls visible | Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'N/A'}
-                  </div>
-                  
+                {/* Mobile and Tablet Controls */}
+                <div className="mt-4 sm:mt-6 space-y-3 lg:hidden">
                   {/* Movement and Rotation Row */}
                   <div className="grid grid-cols-4 gap-2 sm:gap-3">
                     <Button 
                       onClick={() => movePiece('left')}
-                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3"
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3 h-10 sm:h-12 md:h-14 min-w-0 px-1 sm:px-2"
                       disabled={gameOver || !gameStarted}
                     >
-                      ← LEFT
+                      <span className="truncate">← LEFT</span>
                     </Button>
                     <Button 
                       onClick={() => movePiece('right')}
-                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3"
+                      className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-xs sm:text-sm py-2 sm:py-3 h-10 sm:h-12 md:h-14 min-w-0 px-1 sm:px-2"
                       disabled={gameOver || !gameStarted}
                     >
-                      RIGHT →
+                      <span className="truncate">RIGHT →</span>
                     </Button>
                     <Button 
                       onClick={() => rotatePiece()}
-                      className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-xs sm:text-sm py-2 sm:py-3"
+                      className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-xs sm:text-sm py-2 sm:py-3 h-10 sm:h-12 md:h-14 min-w-0 px-1 sm:px-2"
                       disabled={gameOver || !gameStarted}
                     >
-                      ↻ ROTATE
+                      <span className="truncate">↻ <span className="hidden sm:inline">ROT</span><span className="sm:hidden">R</span></span>
                     </Button>
                     <Button 
                       onClick={() => hardDrop()}
-                      className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-xs sm:text-sm py-2 sm:py-3"
+                      className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-xs sm:text-sm py-2 sm:py-3 h-10 sm:h-12 md:h-14 min-w-0 px-1 sm:px-2"
                       disabled={gameOver || !gameStarted}
                     >
-                      ↓ DROP
+                      <span className="truncate">↓ DROP</span>
                     </Button>
                   </div>
                   
-                  {/* Space Button Row */}
+                  {/* Start/Restart Button */}
                   <div className="flex justify-center">
                     <Button 
                       onClick={() => {
@@ -423,48 +433,45 @@ export default function PixelBoxGame() {
                           hardDrop()
                         }
                       }}
-                      className="bg-yellow-700 hover:bg-yellow-600 text-yellow-100 border border-yellow-400 text-xs sm:text-sm py-3 px-8 w-full max-w-xs"
+                      className="bg-yellow-700 hover:bg-yellow-600 text-yellow-100 border border-yellow-400 text-xs sm:text-sm py-3 sm:py-4 px-6 sm:px-8 w-full max-w-xs h-10 sm:h-12 md:h-14"
                       disabled={isPaused}
                     >
-                      {gameOver ? 'RESTART' : !gameStarted ? 'START' : 'SPACE'}
+                      <span className="truncate">
+                        {gameOver ? 'RESTART' : !gameStarted ? 'START' : 'SPACE'}
+                      </span>
                     </Button>
                   </div>
                 </div>
 
-                {/* Desktop Controls - Always rendered but hidden on mobile with CSS */}
-                <div className="mt-6 grid grid-cols-4 gap-3 hidden md:grid lg:grid xl:grid 2xl:grid">
-                  {/* Debug info - remove this after testing */}
-                  <div className="text-center text-xs text-gray-400 mb-2 col-span-4">
-                    Desktop controls visible | Screen width: {typeof window !== 'undefined' ? window.innerWidth : 'N/A'}
-                  </div>
-                  
+                {/* Desktop Controls */}
+                <div className="mt-6 grid grid-cols-4 gap-3 xl:gap-4 hidden lg:grid">
                   <Button 
                     onClick={() => movePiece('left')}
-                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm xl:text-base py-3 xl:py-4 min-w-0 px-2 xl:px-3"
                     disabled={gameOver || !gameStarted}
                   >
-                    ← LEFT
+                    <span className="truncate">← LEFT</span>
                   </Button>
                   <Button 
                     onClick={() => movePiece('right')}
-                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm py-3"
+                    className="bg-green-700 hover:bg-green-600 text-green-100 border border-green-400 text-sm xl:text-base py-3 xl:py-4 min-w-0 px-2 xl:px-3"
                     disabled={gameOver || !gameStarted}
                   >
-                    RIGHT →
+                    <span className="truncate">RIGHT →</span>
                   </Button>
                   <Button 
                     onClick={() => rotatePiece()}
-                    className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm py-3"
+                    className="bg-blue-700 hover:bg-blue-600 text-blue-100 border border-blue-400 text-sm xl:text-base py-3 xl:py-4 min-w-0 px-2 xl:px-3"
                     disabled={gameOver || !gameStarted}
                   >
-                    ↻ ROTATE
+                    <span className="truncate">↻ ROTATE</span>
                   </Button>
                   <Button 
                     onClick={() => hardDrop()}
-                    className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm py-3"
+                    className="bg-red-700 hover:bg-red-600 text-red-100 border border-red-400 text-sm xl:text-base py-3 xl:py-4 min-w-0 px-2 xl:px-3"
                     disabled={gameOver || !gameStarted}
                   >
-                    ↓ DROP
+                    <span className="truncate">↓ DROP</span>
                   </Button>
                 </div>
               </CardContent>
@@ -474,31 +481,31 @@ export default function PixelBoxGame() {
           <aside className="lg:col-span-1 space-y-3 sm:space-y-4">
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-xs sm:text-sm">SCORE</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm break-words">SCORE</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span>CURRENT:</span>
-                  <span className="text-yellow-400">{score.toLocaleString()}</span>
+                  <span className="break-words">CURRENT:</span>
+                  <span className="text-yellow-400 break-words">{score.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span>HIGH:</span>
-                  <span className="text-red-400">{highScore.toLocaleString()}</span>
+                  <span className="break-words">HIGH:</span>
+                  <span className="text-red-400 break-words">{highScore.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span>LEVEL:</span>
-                  <span className="text-blue-400">{level}</span>
+                  <span className="break-words">LEVEL:</span>
+                  <span className="text-blue-400 break-words">{level}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span>LINES:</span>
-                  <span className="text-purple-400">{lines}</span>
+                  <span className="break-words">LINES:</span>
+                  <span className="text-purple-400 break-words">{lines}</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-xs sm:text-sm">NEXT</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm break-words">NEXT</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">
@@ -525,15 +532,15 @@ export default function PixelBoxGame() {
 
             <Card className="bg-gray-900 border-green-400 border-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-400 text-xs sm:text-sm">CONTROLS</CardTitle>
+                <CardTitle className="text-green-400 text-xs sm:text-sm break-words">CONTROLS</CardTitle>
               </CardHeader>
               <CardContent className="space-y-1 text-xs">
-                <div>A/D or ←/→: MOVE</div>
-                <div>W or ↑: ROTATE</div>
-                <div>S or ↓: SOFT DROP</div>
-                <div>SPACE: HARD DROP</div>
-                <div>P: PAUSE</div>
-                <div>G: TOGGLE GHOST</div>
+                <div className="break-words">A/D or ←/→: MOVE</div>
+                <div className="break-words">W or ↑: ROTATE</div>
+                <div className="break-words">S or ↓: SOFT DROP</div>
+                <div className="break-words">SPACE: HARD DROP</div>
+                <div className="break-words">P: PAUSE</div>
+                <div className="break-words">G: TOGGLE GHOST</div>
               </CardContent>
             </Card>
 
@@ -553,7 +560,7 @@ export default function PixelBoxGame() {
                   {isPaused ? 'RESUME' : 'PAUSE'}
                 </Button>
                 <div className="flex items-center justify-between text-xs">
-                  <span>GHOST:</span>
+                  <span className="break-words">GHOST:</span>
                   <Badge 
                     variant={showGhost ? "default" : "secondary"}
                     className={showGhost ? "bg-green-700 text-green-100" : "bg-gray-700 text-gray-300"}
@@ -570,7 +577,7 @@ export default function PixelBoxGame() {
         <div className="w-full mt-6">
           <Card className="bg-gray-900 border-green-400 border-2">
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <p className="text-xs sm:text-sm text-gray-300 text-center leading-relaxed max-w-none">
+              <p className="text-xs sm:text-sm text-gray-300 text-center leading-relaxed break-words hyphens-auto">
                 Stack, rotate, and clear your way to victory in this electrifying block-dropping puzzle! 
                 Seven unique tetromino shapes fall from above, and it's your job to fit them perfectly into 
                 horizontal lines. Rotate pieces with precision, slide them left and right, and use the hard drop 
